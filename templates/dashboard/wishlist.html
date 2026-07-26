@@ -1,0 +1,81 @@
+{% extends 'master/base.html' %}
+
+{% block title %}Wishlist - Islington Marketplace{% endblock %}
+
+{% block content %}
+<div class="dashboard-bg fade-in">
+    <div class="dashboard-bg-content">
+        <h1>My Wishlist</h1>
+        <p>Items you've saved for later</p>
+    </div>
+</div>
+
+<div class="dashboard-layout fade-in">
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">{{ user.first_name.0|default:user.username.0|upper }}</div>
+            <div>
+                <div class="sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="sidebar-user-email">{{ user.email }}</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="sidebar-nav-item"><i class="fas fa-gauge-high"></i> Overview</a>
+            <a href="{% url 'dashboard_profile' %}" class="sidebar-nav-item"><i class="fas fa-user"></i> Profile</a>
+            <a href="{% url 'dashboard_orders' %}" class="sidebar-nav-item"><i class="fas fa-box"></i> Orders</a>
+            <a href="{% url 'dashboard_earnings' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_earnings' %}active{% endif %}"><i class="fas fa-wallet"></i> Earnings</a>
+            <a href="{% url 'dashboard_payment_settings' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_payment_settings' %}active{% endif %}"><i class="fas fa-credit-card"></i> Payment Settings</a>
+            <a href="{% url 'dashboard_wishlist' %}" class="sidebar-nav-item active"><i class="fas fa-heart"></i> Wishlist</a>
+            <a href="{% url 'dashboard_reviews' %}" class="sidebar-nav-item"><i class="fas fa-star"></i> Reviews</a>
+            <a href="{% url 'dashboard_settings' %}" class="sidebar-nav-item"><i class="fas fa-gear"></i> Settings</a>
+            <div class="sidebar-nav-divider"></div>
+            <a href="{% url 'logout' %}" class="sidebar-nav-item danger"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <div class="dashboard-content">
+        {% if products %}
+        <div class="product-grid">
+            {% for product in products %}
+            <article class="product-card">
+                <div class="product-image">
+                    {% if product.product_image %}
+                        <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" loading="lazy">
+                    {% else %}
+                        <div class="product-placeholder"><i class="fas fa-image" style="font-size: 2rem; opacity: 0.3;"></i></div>
+                    {% endif %}
+                    {% if product.discount_price %}
+                    <span class="product-badge-discount">-{{ product.discount_percentage }}%</span>
+                    {% endif %}
+                </div>
+                <div class="product-info">
+                    <div class="product-meta">
+                        <span class="product-category">{{ product.category }}</span>
+                    </div>
+                    <h3 class="product-name"><a href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a></h3>
+                    <div class="product-footer">
+                        <div class="product-price">
+                            {% if product.discount_price %}
+                                <span class="discounted-price">Rs. {{ product.discount_price }}</span>
+                                <span class="original-price">Rs. {{ product.price }}</span>
+                            {% else %}
+                                <span class="current-price">Rs. {{ product.price }}</span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'product_detail' product.id %}" class="btn btn-sm">View</a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state" style="padding: var(--sp-8);">
+            <div class="empty-icon"><i class="fas fa-heart" style="font-size: 1.5rem;"></i></div>
+            <h3>Your wishlist is empty</h3>
+            <p>Save items you love to your wishlist for later</p>
+            <a href="{% url 'products' %}" class="btn btn-primary"><i class="fas fa-shopping-bag"></i> Browse Products</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
