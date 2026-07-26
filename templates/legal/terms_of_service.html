@@ -1,0 +1,166 @@
+{% extends 'master/base.html' %}
+
+{% block title %}Terms of Service - Islington Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+.legal-page { max-width: 860px; margin: 0 auto; }
+.legal-page .page-header { margin-bottom: var(--sp-8); }
+.legal-content {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-xl); padding: var(--sp-10);
+}
+.legal-content h2 {
+    font-family: var(--font-display); font-size: var(--text-lg);
+    font-weight: 600; color: var(--ink); margin: var(--sp-8) 0 var(--sp-4);
+    display: flex; align-items: center; gap: var(--sp-2);
+}
+.legal-content h2:first-child { margin-top: 0; }
+.legal-content h2 i { color: var(--accent); font-size: var(--text-base); }
+.legal-content h3 {
+    font-size: var(--text-base); font-weight: 600; color: var(--ink-soft);
+    margin: var(--sp-5) 0 var(--sp-3);
+}
+.legal-content p {
+    font-size: var(--text-sm); color: var(--ink-muted);
+    line-height: 1.7; margin-bottom: var(--sp-3);
+}
+.legal-content ul, .legal-content ol {
+    margin: var(--sp-3) 0; padding-left: var(--sp-6);
+}
+.legal-content li {
+    font-size: var(--text-sm); color: var(--ink-muted);
+    line-height: 1.7; margin-bottom: var(--sp-2);
+}
+.legal-meta {
+    font-size: var(--text-xs); color: var(--ink-faint);
+    text-align: center; margin-top: var(--sp-4); padding-top: var(--sp-4);
+    border-top: 1px solid var(--border-light);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content" style="padding-top: var(--sp-8); padding-bottom: var(--sp-12);">
+    <div class="legal-page fade-in">
+        <section class="page-header">
+            <div class="page-header-content">
+                <span class="section-badge">Legal</span>
+                <h1>Terms of Service</h1>
+                <p>Terms governing your use of Islington Marketplace</p>
+            </div>
+        </section>
+
+        <div class="legal-content">
+            <h2><i class="fas fa-handshake"></i> 1. Acceptance of Terms</h2>
+            <p>By accessing or using Islington Marketplace (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree, do not use the Service. These Terms constitute a legally binding agreement between you and Islington Marketplace.</p>
+            <p>We reserve the right to modify these Terms at any time. Continued use of the Service after changes constitutes acceptance of the modified Terms.</p>
+
+            <h2><i class="fas fa-user-plus"></i> 2. Account Registration</h2>
+            <p>To access certain features, you must create an account. You agree to:</p>
+            <ul>
+                <li>Provide accurate, current, and complete information during registration</li>
+                <li>Maintain and update your information to keep it accurate and current</li>
+                <li>Maintain the security of your password and account credentials</li>
+                <li>Accept responsibility for all activities that occur under your account</li>
+                <li>Notify us immediately of any unauthorized use of your account</li>
+            </ul>
+            <p>You must be at least 13 years old to create an account. Some features may require you to be 18 or older.</p>
+
+            <h2><i class="fas fa-store"></i> 3. Seller Obligations</h2>
+            <p>If you register as a seller, you agree to:</p>
+            <ul>
+                <li>Provide accurate business and identity information during the application process</li>
+                <li>Comply with all applicable local, national, and international laws and regulations</li>
+                <li>List only genuine, authentic products that you have the right to sell</li>
+                <li>Provide accurate product descriptions, images, and pricing</li>
+                <li>Fulfill orders promptly and ship products within the stated timeframes</li>
+                <li>Honor all completed sales and maintain professional communication with buyers</li>
+                <li>Process returns and refunds in accordance with our Return Policy</li>
+                <li>Pay all applicable platform fees and commissions</li>
+                <li>Maintain appropriate business licenses and tax registrations</li>
+            </ul>
+
+            <h2><i class="fas fa-bag-shopping"></i> 4. Buyer Obligations</h2>
+            <p>As a buyer, you agree to:</p>
+            <ul>
+                <li>Provide accurate shipping and contact information</li>
+                <li>Make timely payments for purchased items</li>
+                <li>Inspect products upon delivery and report issues promptly</li>
+                <li>Use the dispute resolution process rather than chargebacks when possible</li>
+                <li>Treat sellers and other users with respect</li>
+                <li>Not engage in fraudulent purchasing behavior</li>
+            </ul>
+
+            <h2><i class="fas fa-credit-card"></i> 5. Payment Terms</h2>
+            <p>All transactions are processed through our secure payment gateways (eSewa, Khalti, or bank transfer). Payment terms include:</p>
+            <ul>
+                <li>All prices are listed in Nepalese Rupees (NPR) unless otherwise stated</li>
+                <li>Payment is collected from buyers at the time of purchase</li>
+                <li>Seller payouts are processed after the return period has elapsed and the buyer confirms delivery satisfaction</li>
+                <li>Platform commission fees are deducted from seller payouts</li>
+                <li>Refunds are processed through the original payment method</li>
+                <li>We are not responsible for bank processing delays or fees</li>
+            </ul>
+
+            <h2><i class="fas fa-ban"></i> 6. Prohibited Items</h2>
+            <p>The following items are prohibited from being listed on Islington Marketplace:</p>
+            <ul>
+                <li>Weapons, ammunition, and explosive materials</li>
+                <li>Controlled substances and illegal drugs</li>
+                <li>Counterfeit or stolen goods</li>
+                <li>Products involving endangered species</li>
+                <li>Recalled or banned products</li>
+                <li>Items that violate intellectual property rights</li>
+                <li>Adult/sexual content</li>
+                <li>Gambling-related items</li>
+            </ul>
+            <p>Some items are restricted and require prior approval. See our <a href="{% url 'prohibited_items' %}" style="color: var(--primary);">Prohibited Items page</a> for full details.</p>
+
+            <h2><i class="fas fa-registered"></i> 7. Intellectual Property</h2>
+            <p>All content on the Service, including text, graphics, logos, icons, images, and software, is the property of Islington Marketplace or its content suppliers and is protected by Nepalese and international intellectual property laws.</p>
+            <ul>
+                <li>You may not reproduce, distribute, or create derivative works without our express written permission</li>
+                <li>Seller product listings and images remain the intellectual property of the seller</li>
+                <li>By listing products, sellers grant Islington Marketplace a non-exclusive license to display and promote those products on the Service</li>
+                <li>We respect intellectual property rights and will respond to valid DMCA takedown requests</li>
+            </ul>
+
+            <h2><i class="fas fa-shield-halved"></i> 8. Limitation of Liability</h2>
+            <p>To the maximum extent permitted by law:</p>
+            <ul>
+                <li>Islington Marketplace acts as an intermediary platform and is not a party to transactions between buyers and sellers</li>
+                <li>We do not guarantee the quality, safety, or legality of items listed</li>
+                <li>We are not liable for any indirect, incidental, special, or consequential damages</li>
+                <li>Our total liability shall not exceed the greater of the amount you paid us in the 12 months prior to the claim or NPR 10,000</li>
+                <li>We are not responsible for the conduct of users, whether online or offline</li>
+            </ul>
+
+            <h2><i class="fas fa-scale-balanced"></i> 9. Dispute Resolution</h2>
+            <p>Any disputes arising from these Terms or use of the Service shall be resolved as follows:</p>
+            <ol>
+                <li><strong>Direct Communication:</strong> Parties should first attempt to resolve disputes directly through our messaging system</li>
+                <li><strong>Platform Mediation:</strong> If unresolved, either party may request Islington Marketplace to mediate</li>
+                <li><strong>Formal Dispute:</strong> Unresolved disputes shall be submitted to binding arbitration in Kathmandu, Nepal</li>
+                <li><strong>Governing Law:</strong> These Terms are governed by the laws of Nepal</li>
+            </ol>
+
+            <h2><i class="fas fa-user-xmark"></i> 10. Termination</h2>
+            <p>We reserve the right to suspend or terminate your account and access to the Service at our sole discretion, with or without notice, for:</p>
+            <ul>
+                <li>Violation of these Terms or any applicable policy</li>
+                <li>Fraudulent, illegal, or harmful conduct</li>
+                <li>Non-payment of fees or commissions</li>
+                <li>Extended periods of inactivity</li>
+                <li>Requests by law enforcement or government agencies</li>
+            </ul>
+            <p>You may terminate your account at any time by contacting support. Upon termination, your right to use the Service ceases immediately.</p>
+
+            <h2><i class="fas fa-gavel"></i> 11. Governing Law</h2>
+            <p>These Terms shall be governed by and construed in accordance with the laws of Nepal, without regard to its conflict of law provisions. Any legal proceedings must be brought in courts located in Kathmandu, Nepal.</p>
+
+            <div class="legal-meta">Last Updated: July 26, 2026</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
