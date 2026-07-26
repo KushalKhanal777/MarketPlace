@@ -1,0 +1,447 @@
+{% extends 'master/base.html' %}
+{% load static %}
+
+{% block title %}Products - Islington Marketplace{% endblock %}
+
+{% block content %}
+<!-- Ad Banner Hero -->
+<section class="ad-hero" id="adHero">
+    <div class="ad-hero-slides">
+        <!-- Slide 1 -->
+        <div class="ad-hero-slide active" data-slide="0">
+            <div class="ad-hero-bg ad-hero-bg-1"></div>
+            <div class="ad-hero-content">
+                <div class="ad-hero-text">
+                    <span class="ad-hero-badge"><i class="fas fa-bolt"></i> Flash Sale</span>
+                    <h2 class="ad-hero-title">Up to 50% Off Electronics</h2>
+                    <p class="ad-hero-subtitle">Limited time offer on top brands. Don't miss out!</p>
+                    <a href="{% url 'products' %}?category=electronics" class="btn btn-primary btn-sm"><i class="fas fa-shopping-bag"></i> Shop Now</a>
+                </div>
+                <div class="ad-hero-visual">
+                    <div class="ad-hero-discount">
+                        <span class="ad-hero-discount-number">50</span>
+                        <span class="ad-hero-discount-symbol">%<span>OFF</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="ad-hero-slide" data-slide="1">
+            <div class="ad-hero-bg ad-hero-bg-2"></div>
+            <div class="ad-hero-content">
+                <div class="ad-hero-text">
+                    <span class="ad-hero-badge"><i class="fas fa-truck-fast"></i> Free Delivery</span>
+                    <h2 class="ad-hero-title">Free Shipping Over Rs. 5,000</h2>
+                    <p class="ad-hero-subtitle">No minimum purchase required. Fast delivery across Nepal.</p>
+                    <a href="{% url 'products' %}" class="btn btn-primary btn-sm"><i class="fas fa-arrow-right"></i> Browse Products</a>
+                </div>
+                <div class="ad-hero-visual">
+                    <div class="ad-hero-icon-wrap">
+                        <i class="fas fa-truck-fast"></i>
+                        <span class="ad-hero-free-tag">FREE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="ad-hero-slide" data-slide="2">
+            <div class="ad-hero-bg ad-hero-bg-3"></div>
+            <div class="ad-hero-content">
+                <div class="ad-hero-text">
+                    <span class="ad-hero-badge"><i class="fas fa-star"></i> New Arrivals</span>
+                    <h2 class="ad-hero-title">Discover What's New</h2>
+                    <p class="ad-hero-subtitle">Fresh picks added daily. Be the first to shop new trends.</p>
+                    <a href="{% url 'search' %}?sort=newest" class="btn btn-primary btn-sm"><i class="fas fa-sparkles"></i> Explore New</a>
+                </div>
+                <div class="ad-hero-visual">
+                    <div class="ad-hero-icon-wrap">
+                        <i class="fas fa-certificate"></i>
+                        <span class="ad-hero-free-tag">NEW</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 4 -->
+        <div class="ad-hero-slide" data-slide="3">
+            <div class="ad-hero-bg ad-hero-bg-4"></div>
+            <div class="ad-hero-content">
+                <div class="ad-hero-text">
+                    <span class="ad-hero-badge"><i class="fas fa-shield-halved"></i> Trust</span>
+                    <h2 class="ad-hero-title">100% Secure Checkout</h2>
+                    <p class="ad-hero-subtitle">Shop with confidence. Easy returns within 30 days.</p>
+                    <a href="{% url 'about' %}" class="btn btn-primary btn-sm"><i class="fas fa-shield-halved"></i> Why Us</a>
+                </div>
+                <div class="ad-hero-visual">
+                    <div class="ad-hero-icon-wrap">
+                        <i class="fas fa-shield-halved"></i>
+                        <span class="ad-hero-free-tag">SAFE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Dots -->
+    <div class="ad-hero-dots">
+        <button class="ad-hero-dot active" data-slide="0" aria-label="Slide 1"></button>
+        <button class="ad-hero-dot" data-slide="1" aria-label="Slide 2"></button>
+        <button class="ad-hero-dot" data-slide="2" aria-label="Slide 3"></button>
+        <button class="ad-hero-dot" data-slide="3" aria-label="Slide 4"></button>
+    </div>
+</section>
+
+<!-- Breadcrumb -->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol class="breadcrumb-list">
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></li>
+        {% if selected_category %}
+            <li><a href="{% url 'products' %}">Products</a></li>
+            <li class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></li>
+            <li class="breadcrumb-current" id="breadcrumbCurrent">{{ hero_context.title }}</li>
+        {% else %}
+            <li class="breadcrumb-current" id="breadcrumbCurrent">All Products</li>
+        {% endif %}
+    </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="page-title-row">
+    <div class="page-title-left">
+        <h1 class="page-title" id="pageTitle">{{ hero_context.title|default:'All Products' }}</h1>
+        <span class="page-product-count" id="pageProductCount">{{ product_count }} product{{ product_count|pluralize }}</span>
+    </div>
+    <div class="page-title-right">
+        <div class="page-sort">
+            <label class="page-sort-label" for="sortSelect">Sort by:</label>
+            <select class="page-sort-select" id="sortSelect">
+                <option value="newest">Newest</option>
+                <option value="popular">Most Popular</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+            </select>
+        </div>
+        <div class="page-view-toggle">
+            <button class="page-view-btn active" data-view="grid" aria-label="Grid view"><i class="fas fa-store"></i></button>
+            <button class="page-view-btn" data-view="list" aria-label="List view"><i class="fas fa-list"></i></button>
+        </div>
+    </div>
+</div>
+
+<section class="products-page fade-in">
+    <div class="filter-sidebar-overlay" id="filterOverlay"></div>
+    <aside class="filter-sidebar" id="filterSidebar">
+        <div class="filter-header">
+            <h3>Categories</h3>
+            <button class="btn btn-sm btn-ghost" onclick="closeFilter()" style="display: none;" id="filterCloseBtn"><i class="fas fa-xmark"></i></button>
+            <span class="filter-count">{{ products|length }} items</span>
+        </div>
+        <ul class="category-list">
+            <li>
+                <a href="{% url 'products' %}" class="{% if not selected_category %}active{% endif %}">
+                    <span class="category-list-icon"><i class="fas fa-store"></i></span>
+                    All Products
+                </a>
+            </li>
+            {% for cat in categories %}
+            <li>
+                <a href="{% url 'products' %}?category={{ cat.slug }}" class="{% if selected_category == cat.slug %}active{% endif %}">
+                    <span class="category-list-icon">
+                        {% if cat.icon == 'fa-spa' %}<img src="{% static 'images/cat-beauty.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-book' %}<img src="{% static 'images/cat-books.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-shirt' %}<img src="{% static 'images/cat-clothes.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-microchip' %}<img src="{% static 'images/cat-electronics.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-house' %}<img src="{% static 'images/cat-home.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-dumbbell' %}<img src="{% static 'images/cat-sports.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-box' %}<img src="{% static 'images/cat-alcohol.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-utensils' %}<img src="{% static 'images/cat-food.svg' %}" alt="">
+                        {% else %}<i class="fas fa-tag"></i>
+                        {% endif %}
+                    </span>
+                    {{ cat.name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </aside>
+
+    <div class="products-content">
+        <button class="mobile-filter-toggle" onclick="openFilter()">
+            <i class="fas fa-sliders"></i> Filters
+            {% if selected_category %}<span style="color: var(--primary); font-weight: 600;">(Active)</span>{% endif %}
+        </button>
+
+        <div class="product-grid">
+            {% for product in products %}
+            <article class="product-card" data-scroll="fade-up">
+                <div class="product-image">
+                    {% if product.product_image %}
+                        <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" loading="lazy">
+                    {% else %}
+                        <div class="product-placeholder"><i class="fas fa-image" style="font-size: 2rem; opacity: 0.3;"></i></div>
+                    {% endif %}
+                    {% if product.discount_price %}
+                    <span class="product-badge-discount">-{{ product.discount_percentage }}%</span>
+                    {% endif %}
+                    <span class="product-badge">{{ product.category }}</span>
+                    <div class="product-actions-top">
+                        <button class="product-wishlist-btn" title="Add to Wishlist" onclick="toggleWishlist({{ product.id }}, this)">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-overlay">
+                        <a href="{% url 'product_detail' product.id %}" class="btn-quick-view">Quick View</a>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <div class="product-meta">
+                        <span class="product-category">{{ product.category }}</span>
+                        {% if product.brand %}<span class="product-brand">by {{ product.brand }}</span>{% endif %}
+                    </div>
+                    <h3 class="product-name">
+                        <a href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a>
+                    </h3>
+                    <div class="product-rating">
+                        <span class="product-stars">
+                            {% for i in "12345" %}{% if forloop.counter <= product.average_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                        </span>
+                        <span class="product-review-count">({{ product.review_count }})</span>
+                    </div>
+                    <div class="product-footer">
+                        <div class="product-price">
+                            {% if product.discount_price %}
+                                <span class="discounted-price">Rs. {{ product.discount_price }}</span>
+                                <span class="original-price">Rs. {{ product.price }}</span>
+                            {% else %}
+                                <span class="current-price">Rs. {{ product.price }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="product-card-actions">
+                            <button class="btn btn-add-cart" onclick="quickAddToCart({{ product.id }})">
+                                <i class="fas fa-shopping-bag"></i> Add to Cart
+                            </button>
+                            <button class="btn btn-buy-now" onclick="buyNow({{ product.id }})">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-box-open" style="font-size: 1.5rem;"></i></div>
+                <h3>No Products Found</h3>
+                <p>We couldn't find any products matching your criteria.</p>
+                <a href="{% url 'products' %}" class="btn btn-primary">View All Products</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Ad Hero Carousel
+(function() {
+    var slides = document.querySelectorAll('.ad-hero-slide');
+    var dots = document.querySelectorAll('.ad-hero-dot');
+    if (slides.length < 2) return;
+    var current = 0;
+    var interval = 4000;
+    var timer;
+
+    function goToSlide(index) {
+        slides[current].classList.remove('active');
+        dots[current].classList.remove('active');
+        current = index;
+        slides[current].classList.add('active');
+        dots[current].classList.add('active');
+    }
+
+    function nextSlide() { goToSlide((current + 1) % slides.length); }
+
+    function startTimer() { clearInterval(timer); timer = setInterval(nextSlide, interval); }
+
+    dots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+            goToSlide(parseInt(this.dataset.slide));
+            startTimer();
+        });
+    });
+
+    var hero = document.getElementById('adHero');
+    if (hero) {
+        hero.addEventListener('mouseenter', function() { clearInterval(timer); });
+        hero.addEventListener('mouseleave', function() { startTimer(); });
+    }
+
+    startTimer();
+})();
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function updateHero(data) {
+    var badge = document.getElementById('heroBadgeText');
+    var badgeIcon = document.querySelector('#heroBadge i');
+    var title = document.getElementById('heroTitle');
+    var subtitle = document.getElementById('heroSubtitle');
+    var count = document.getElementById('heroCount');
+    var countLabel = count ? count.nextElementSibling : null;
+
+    if (!title) return;
+
+    title.classList.add('transitioning');
+    subtitle.classList.add('transitioning');
+
+    setTimeout(function() {
+        if (badge) badge.textContent = data.badge;
+        if (badgeIcon) badgeIcon.className = 'fas ' + data.icon;
+        title.textContent = data.title;
+        subtitle.textContent = data.subtitle;
+        if (count) count.textContent = data.product_count;
+        if (countLabel) countLabel.textContent = 'product' + (data.product_count == 1 ? '' : 's') + ' available';
+
+        title.classList.remove('transitioning');
+        subtitle.classList.remove('transitioning');
+    }, 200);
+}
+
+function openFilter() {
+    document.getElementById('filterSidebar').classList.add('active');
+    document.getElementById('filterOverlay').classList.add('active');
+    document.getElementById('filterCloseBtn').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFilter() {
+    document.getElementById('filterSidebar').classList.remove('active');
+    document.getElementById('filterOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+document.getElementById('filterOverlay').addEventListener('click', closeFilter);
+
+function toggleWishlist(productId, btn) {
+    fetch('/api/wishlist/toggle/' + productId + '/', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            if (data.added) {
+                btn.classList.add('active');
+                btn.querySelector('i').className = 'fas fa-heart';
+            } else {
+                btn.classList.remove('active');
+                btn.querySelector('i').className = 'far fa-heart';
+            }
+            showToast(data.message, 'success');
+        } else {
+            window.location.href = '/login/';
+        }
+    })
+    .catch(() => {
+        window.location.href = '/login/';
+    });
+}
+
+function quickAddToCart(productId) {
+    const formData = new FormData();
+    formData.append('quantity', 1);
+    formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+    fetch('/cart/add/' + productId + '/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            const badge = document.querySelector('#cartBtn .action-badge');
+            if (badge) {
+                badge.textContent = data.cart_total;
+            } else {
+                const newBadge = document.createElement('span');
+                newBadge.className = 'action-badge';
+                newBadge.textContent = data.cart_total;
+                document.getElementById('cartBtn').appendChild(newBadge);
+            }
+            const mobileBadge = document.querySelector('#mobileCartBtn .action-badge');
+            if (mobileBadge) {
+                mobileBadge.textContent = data.cart_total;
+            } else if (document.getElementById('mobileCartBtn')) {
+                const mb = document.createElement('span');
+                mb.className = 'action-badge';
+                mb.textContent = data.cart_total;
+                document.getElementById('mobileCartBtn').appendChild(mb);
+            }
+            showToast(data.message, 'success');
+        }
+    })
+    .catch(() => {});
+}
+
+function buyNow(productId) {
+    const formData = new FormData();
+    formData.append('quantity', 1);
+    formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+    fetch('/cart/add/' + productId + '/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/checkout/';
+        }
+    })
+    .catch(() => {});
+}
+
+function showToast(message, type) {
+    let c = document.querySelector('.toast-container');
+    if (!c) { c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); }
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + (type || '');
+    toast.innerHTML = '<span>' + message + '</span><button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-xmark"></i></button>';
+    c.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+}
+
+// View toggle (grid/list)
+document.querySelectorAll('.page-view-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.page-view-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const grid = document.querySelector('.product-grid');
+        if (this.dataset.view === 'list') {
+            grid.style.gridTemplateColumns = '1fr';
+        } else {
+            grid.style.gridTemplateColumns = '';
+        }
+    });
+});
+</script>
+{% endblock %}
