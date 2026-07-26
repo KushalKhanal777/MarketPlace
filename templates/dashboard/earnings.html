@@ -1,0 +1,188 @@
+{% extends 'master/base.html' %}
+{% load static %}
+
+{% block title %}Earnings - Islington Marketplace{% endblock %}
+
+{% block content %}
+<div class="dashboard-bg fade-in">
+    <div class="dashboard-bg-orb dashboard-bg-orb-1"></div>
+    <div class="dashboard-bg-orb dashboard-bg-orb-2"></div>
+    <div class="dashboard-bg-orb dashboard-bg-orb-3"></div>
+    <div class="dashboard-bg-content">
+        <div class="dashboard-bg-left">
+            <h1>Earnings</h1>
+            <p>Track your sales, earnings, and payouts.</p>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-layout fade-in">
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">{{ user.first_name.0|default:user.username.0|upper }}</div>
+            <div>
+                <div class="sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="sidebar-user-email">{{ user.email }}</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="sidebar-nav-item"><i class="fas fa-gauge-high"></i> Overview</a>
+            <a href="{% url 'dashboard_profile' %}" class="sidebar-nav-item"><i class="fas fa-user"></i> Profile</a>
+            <a href="{% url 'dashboard_orders' %}" class="sidebar-nav-item"><i class="fas fa-box"></i> Orders</a>
+            <a href="{% url 'dashboard_earnings' %}" class="sidebar-nav-item active"><i class="fas fa-wallet"></i> Earnings</a>
+            <a href="{% url 'dashboard_payment_settings' %}" class="sidebar-nav-item"><i class="fas fa-credit-card"></i> Payment Settings</a>
+            <a href="{% url 'dashboard_wishlist' %}" class="sidebar-nav-item"><i class="fas fa-heart"></i> Wishlist</a>
+            <a href="{% url 'dashboard_reviews' %}" class="sidebar-nav-item"><i class="fas fa-star"></i> Reviews</a>
+            <a href="{% url 'dashboard_settings' %}" class="sidebar-nav-item"><i class="fas fa-gear"></i> Settings</a>
+            <div class="sidebar-nav-divider"></div>
+            <a href="{% url 'logout' %}" class="sidebar-nav-item danger"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <div class="dashboard-content">
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon green"><i class="fas fa-wallet"></i></div>
+                </div>
+                <div class="stat-card-info">
+                    <span class="stat-card-value">Rs. {{ total_earnings|floatformat:2 }}</span>
+                    <span class="stat-card-label">Total Earnings</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon blue"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="stat-card-info">
+                    <span class="stat-card-value">Rs. {{ total_paid_out|floatformat:2 }}</span>
+                    <span class="stat-card-label">Paid Out</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon amber"><i class="fas fa-clock"></i></div>
+                </div>
+                <div class="stat-card-info">
+                    <span class="stat-card-value">Rs. {{ net_pending|floatformat:2 }}</span>
+                    <span class="stat-card-label">Pending Balance</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon purple"><i class="fas fa-shopping-bag"></i></div>
+                </div>
+                <div class="stat-card-info">
+                    <span class="stat-card-value">{{ total_orders }}</span>
+                    <span class="stat-card-label">Total Orders</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commission Info -->
+        <div class="checkout-card" style="margin-bottom: var(--sp-6);">
+            <h2><i class="fas fa-info-circle"></i> Commission Summary</h2>
+            <div style="display: flex; gap: var(--sp-8); flex-wrap: wrap;">
+                <div>
+                    <div style="font-size: var(--text-sm); color: var(--ink-muted); margin-bottom: 4px;">Platform Commission Rate</div>
+                    <div style="font-size: var(--text-lg); font-weight: 700; color: var(--ink);">{{ commission_rate }}%</div>
+                </div>
+                <div>
+                    <div style="font-size: var(--text-sm); color: var(--ink-muted); margin-bottom: 4px;">Commission Amount (estimated)</div>
+                    <div style="font-size: var(--text-lg); font-weight: 700; color: var(--danger);">Rs. {{ commission_amount|floatformat:2 }}</div>
+                </div>
+                <div>
+                    <div style="font-size: var(--text-sm); color: var(--ink-muted); margin-bottom: 4px;">Your Net Pending</div>
+                    <div style="font-size: var(--text-lg); font-weight: 700; color: var(--success);">Rs. {{ net_pending|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payout History -->
+        <div class="checkout-card" style="margin-bottom: var(--sp-6);">
+            <h2><i class="fas fa-money-bill-wave"></i> Payout History</h2>
+            {% if payouts %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: var(--text-sm);">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border);">
+                            <th style="padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--ink-muted); font-weight: 600;">Date</th>
+                            <th style="padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--ink-muted); font-weight: 600;">Amount</th>
+                            <th style="padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--ink-muted); font-weight: 600;">Method</th>
+                            <th style="padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--ink-muted); font-weight: 600;">Account</th>
+                            <th style="padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--ink-muted); font-weight: 600;">Status</th>
+                            <th style="padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--ink-muted); font-weight: 600;">Reference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payout in payouts %}
+                        <tr style="border-bottom: 1px solid var(--border-light);">
+                            <td style="padding: var(--sp-3) var(--sp-4);">{{ payout.created_at|date:"M d, Y" }}</td>
+                            <td style="padding: var(--sp-3) var(--sp-4); font-weight: 600;">Rs. {{ payout.amount|floatformat:2 }}</td>
+                            <td style="padding: var(--sp-3) var(--sp-4);">{{ payout.get_method_display }}</td>
+                            <td style="padding: var(--sp-3) var(--sp-4); font-family: monospace;">{{ payout.account_number }}</td>
+                            <td style="padding: var(--sp-3) var(--sp-4);">
+                                {% if payout.status == 'completed' %}
+                                    <span style="color: var(--success); font-weight: 600;">Completed</span>
+                                {% elif payout.status == 'processing' %}
+                                    <span style="color: var(--info); font-weight: 600;">Processing</span>
+                                {% elif payout.status == 'pending' %}
+                                    <span style="color: var(--warning); font-weight: 600;">Pending</span>
+                                {% else %}
+                                    <span style="color: var(--danger); font-weight: 600;">Failed</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: var(--sp-3) var(--sp-4); font-family: monospace; font-size: 12px;">{{ payout.reference_id|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state" style="padding: var(--sp-8); margin: 0;">
+                <div class="empty-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <h3>No payouts yet</h3>
+                <p>Your payout history will appear here once you receive your first payout.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Sales -->
+        <div class="checkout-card">
+            <h2><i class="fas fa-receipt"></i> Recent Sales</h2>
+            {% if sold_items %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: var(--text-sm);">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border);">
+                            <th style="padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--ink-muted); font-weight: 600;">Date</th>
+                            <th style="padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--ink-muted); font-weight: 600;">Product</th>
+                            <th style="padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--ink-muted); font-weight: 600;">Qty</th>
+                            <th style="padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--ink-muted); font-weight: 600;">Price</th>
+                            <th style="padding: var(--sp-3) var(--sp-4); text-align: left; color: var(--ink-muted); font-weight: 600;">Order</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in sold_items %}
+                        <tr style="border-bottom: 1px solid var(--border-light);">
+                            <td style="padding: var(--sp-3) var(--sp-4);">{{ item.order.created_at|date:"M d, Y" }}</td>
+                            <td style="padding: var(--sp-3) var(--sp-4); font-weight: 500;">{{ item.product.product_name }}</td>
+                            <td style="padding: var(--sp-3) var(--sp-4);">{{ item.quantity }}</td>
+                            <td style="padding: var(--sp-3) var(--sp-4); font-weight: 600; color: var(--accent);">Rs. {{ item.subtotal|floatformat:2 }}</td>
+                            <td style="padding: var(--sp-3) var(--sp-4); font-family: monospace; font-size: 12px;">{{ item.order.order_number }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state" style="padding: var(--sp-8); margin: 0;">
+                <div class="empty-icon"><i class="fas fa-receipt"></i></div>
+                <h3>No sales yet</h3>
+                <p>Your sales history will appear here once you make your first sale.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
