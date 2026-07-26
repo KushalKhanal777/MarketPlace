@@ -1,22 +1,696 @@
 {% extends 'master/base.html' %}
+{% load static %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Islington Marketplace — Premium Shopping Experience{% endblock %}
 
 {% block content %}
-<h2>Our Products</h2>
-
-{% for product in products %}
-    <div class="product">
-        <a href = "{% url 'product_detail' product.id %}">
-            {{ product.name}}
-        </a>
-
-
-        <p>Price: Rs. {{ product.price }}</p>
-
+<!-- Hero Carousel -->
+<section class="hero-carousel" aria-label="Promotions">
+    <div class="hero-slides">
+        <!-- Slide 1 -->
+        <div class="hero-slide active" data-slide="0">
+            <div class="hero-slide-bg slide-bg-1"></div>
+            <div class="hero-shape hero-shape-1"></div>
+            <div class="hero-shape hero-shape-2"></div>
+            {% if hero_products %}
+            <div class="hero-floating-products">
+                {% for p in hero_products|slice:":4" %}
+                <a href="{% url 'product_detail' p.id %}" class="hero-float-product hfp-{{ forloop.counter }}" title="{{ p.product_name }}">
+                    {% if p.product_image %}
+                    <img src="{{ p.product_image.url }}" alt="{{ p.product_name }}">
+                    {% endif %}
+                    <span class="hfp-price">Rs. {{ p.discount_price|default:p.price|floatformat:0 }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="hero-slide-content">
+                <span class="hero-badge"><i class="fas fa-bolt"></i> New Season 2026</span>
+                <h1>Discover Quality Products You'll Love</h1>
+                <p>Shop from trusted sellers across Nepal. Curated collections, unbeatable prices, and a seamless experience.</p>
+                <div class="hero-actions">
+                    <a href="{% url 'products' %}" class="btn btn-primary"><i class="fas fa-shopping-bag"></i> Shop Now</a>
+                    <a href="{% url 'search' %}?sort=popular" class="btn btn-outline"><i class="fas fa-fire"></i> Best Sellers</a>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="hero-slide" data-slide="1">
+            <div class="hero-slide-bg slide-bg-2"></div>
+            <div class="hero-shape hero-shape-3"></div>
+            <div class="hero-shape hero-shape-4"></div>
+            {% if hero_products %}
+            <div class="hero-floating-products">
+                {% for p in hero_products|slice:"4:8" %}
+                <a href="{% url 'product_detail' p.id %}" class="hero-float-product hfp-{{ forloop.counter }}" title="{{ p.product_name }}">
+                    {% if p.product_image %}
+                    <img src="{{ p.product_image.url }}" alt="{{ p.product_name }}">
+                    {% endif %}
+                    <span class="hfp-price">Rs. {{ p.discount_price|default:p.price|floatformat:0 }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="hero-slide-content">
+                <span class="hero-badge"><i class="fas fa-percent"></i> Up to 50% Off</span>
+                <h1>Mega Sale Is Live Now</h1>
+                <p>Grab unbeatable deals on Electronics, Fashion, Beauty & more. Limited time offers — don't miss out!</p>
+                <div class="hero-actions">
+                    <a href="{% url 'products' %}" class="btn btn-primary"><i class="fas fa-fire"></i> Shop the Sale</a>
+                    <a href="{% url 'search' %}?sort=popular" class="btn btn-outline"><i class="fas fa-clock"></i> Deals Ending Soon</a>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="hero-slide" data-slide="2">
+            <div class="hero-slide-bg slide-bg-3"></div>
+            <div class="hero-shape hero-shape-5"></div>
+            <div class="hero-shape hero-shape-6"></div>
+            {% if hero_products %}
+            <div class="hero-floating-products">
+                {% for p in hero_products|slice:"8:12" %}
+                <a href="{% url 'product_detail' p.id %}" class="hero-float-product hfp-{{ forloop.counter }}" title="{{ p.product_name }}">
+                    {% if p.product_image %}
+                    <img src="{{ p.product_image.url }}" alt="{{ p.product_name }}">
+                    {% endif %}
+                    <span class="hfp-price">Rs. {{ p.discount_price|default:p.price|floatformat:0 }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="hero-slide-content">
+                <span class="hero-badge"><i class="fas fa-truck-fast"></i> Free Delivery</span>
+                <h1>Free Shipping On Every Order</h1>
+                <p>No minimum purchase required. Fast, reliable delivery right to your doorstep across Nepal.</p>
+                <div class="hero-actions">
+                    <a href="{% url 'products' %}" class="btn btn-primary"><i class="fas fa-shopping-bag"></i> Start Shopping</a>
+                    <a href="{% url 'about' %}" class="btn btn-outline"><i class="fas fa-shield-halved"></i> Why Choose Us</a>
+                </div>
+            </div>
+        </div>
     </div>
-{% empty %}
-    <p>No products available.</p>
-{% endfor %}
 
+    <!-- Arrow Navigation -->
+    <button class="hero-arrow hero-arrow-prev" aria-label="Previous slide"><i class="fas fa-chevron-left"></i></button>
+    <button class="hero-arrow hero-arrow-next" aria-label="Next slide"><i class="fas fa-chevron-right"></i></button>
+
+    <!-- Navigation Dots -->
+    <div class="hero-dots">
+        <button class="hero-dot active" data-slide="0" aria-label="Slide 1"></button>
+        <button class="hero-dot" data-slide="1" aria-label="Slide 2"></button>
+        <button class="hero-dot" data-slide="2" aria-label="Slide 3"></button>
+    </div>
+</section>
+
+<!-- Features -->
+<div class="features-grid" data-scroll-stagger data-scroll="fade-up">
+    <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-truck-fast"></i></div>
+        <div class="feature-info">
+            <h3>Free Shipping</h3>
+            <p>On all orders over Rs. 5,000</p>
+        </div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon" style="background: var(--warning-bg); color: var(--warning);"><i class="fas fa-shield-halved"></i></div>
+        <div class="feature-info">
+            <h3>Secure Payment</h3>
+            <p>100% secure checkout</p>
+        </div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon" style="background: var(--success-bg); color: var(--success);"><i class="fas fa-rotate-left"></i></div>
+        <div class="feature-info">
+            <h3>Easy Returns</h3>
+            <p>30-day return policy</p>
+        </div>
+    </div>
+</div>
+
+<!-- Categories -->
+{% if categories %}
+<section class="section fade-in" data-scroll="fade-up">
+    <div class="section-header">
+        <h2>Shop by Category</h2>
+        <a href="{% url 'products' %}" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="categories-grid" data-scroll-stagger data-scroll="fade-up">
+        {% for cat in categories %}
+        <a href="{% url 'products' %}?category={{ cat.slug }}" class="category-card
+            {% if cat.icon == 'fa-spa' %}cat-beauty
+            {% elif cat.icon == 'fa-book' %}cat-books
+            {% elif cat.icon == 'fa-shirt' %}cat-clothes
+            {% elif cat.icon == 'fa-microchip' %}cat-electronics
+            {% elif cat.icon == 'fa-house' %}cat-home
+            {% elif cat.icon == 'fa-dumbbell' %}cat-sports
+            {% elif cat.icon == 'fa-box' %}cat-alcohol
+            {% elif cat.icon == 'fa-utensils' %}cat-food
+            {% endif %}">
+            <div class="category-icon">
+                {% if cat.icon == 'fa-spa' %}
+                    <img src="{% static 'images/cat-beauty.svg' %}" alt="{{ cat.name }}">
+                {% elif cat.icon == 'fa-book' %}
+                    <img src="{% static 'images/cat-books.svg' %}" alt="{{ cat.name }}">
+                {% elif cat.icon == 'fa-shirt' %}
+                    <img src="{% static 'images/cat-clothes.svg' %}" alt="{{ cat.name }}">
+                {% elif cat.icon == 'fa-microchip' %}
+                    <img src="{% static 'images/cat-electronics.svg' %}" alt="{{ cat.name }}">
+                {% elif cat.icon == 'fa-house' %}
+                    <img src="{% static 'images/cat-home.svg' %}" alt="{{ cat.name }}">
+                {% elif cat.icon == 'fa-dumbbell' %}
+                    <img src="{% static 'images/cat-sports.svg' %}" alt="{{ cat.name }}">
+                {% elif cat.icon == 'fa-box' %}
+                    <img src="{% static 'images/cat-alcohol.svg' %}" alt="{{ cat.name }}">
+                {% elif cat.icon == 'fa-utensils' %}
+                    <img src="{% static 'images/cat-food.svg' %}" alt="{{ cat.name }}">
+                {% else %}
+                    <i class="fas fa-{{ cat.icon }}"></i>
+                {% endif %}
+            </div>
+            <h3>{{ cat.name }}</h3>
+            <span class="category-count">{{ cat.product_count }} products</span>
+            <span class="category-arrow"><i class="fas fa-arrow-right"></i></span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Flash Sale -->
+{% if flash_sale %}
+<section class="section fade-in" data-scroll="fade-up">
+    <div class="flash-sale-header">
+        <div class="flash-sale-info">
+            <span class="section-badge flash"><i class="fas fa-bolt"></i> Flash Sale</span>
+            <h2>Don't Miss These Deals</h2>
+        </div>
+        <a href="{% url 'products' %}" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="product-grid">
+        {% for product in flash_sale %}
+        <article class="product-card product-card-flash">
+            <div class="product-image">
+                {% if product.product_image %}
+                    <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" loading="lazy">
+                {% else %}
+                    <div class="product-placeholder"><i class="fas fa-image" style="font-size: 2rem; opacity: 0.3;"></i></div>
+                {% endif %}
+                {% if product.discount_price %}
+                <span class="product-badge-discount flash-badge"><i class="fas fa-bolt"></i> -{{ product.discount_percentage }}%</span>
+                {% endif %}
+                <div class="product-actions-top">
+                    <button class="product-wishlist-btn" title="Add to Wishlist" onclick="toggleHomeWishlist({{ product.id }}, this)"><i class="far fa-heart"></i></button>
+                </div>
+                <div class="product-overlay">
+                    <a href="{% url 'product_detail' product.id %}" class="btn-quick-view">Quick View</a>
+                </div>
+            </div>
+            <div class="product-info">
+                <div class="product-meta">
+                    <span class="product-category">{{ product.category }}</span>
+                </div>
+                <h3 class="product-name">
+                    <a href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a>
+                </h3>
+                <div class="product-rating">
+                    <span class="product-stars">
+                        {% for i in "12345" %}{% if forloop.counter <= product.average_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                    </span>
+                    <span class="product-review-count">({{ product.review_count }})</span>
+                </div>
+                <div class="product-footer">
+                    <div class="product-price">
+                        {% if product.discount_price %}
+                            <span class="discounted-price">Rs. {{ product.discount_price }}</span>
+                            <span class="original-price">Rs. {{ product.price }}</span>
+                        {% else %}
+                            <span class="current-price">Rs. {{ product.price }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-card-actions">
+                        <button class="btn btn-add-cart" onclick="quickAddToCart({{ product.id }})">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                        <button class="btn btn-buy-now" onclick="buyNow({{ product.id }})">
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Featured Products -->
+{% if featured_products %}
+<section class="section fade-in" data-scroll="fade-up">
+    <div class="section-header">
+        <h2><i class="fas fa-star" style="color: var(--warning);"></i> Featured Products</h2>
+        <a href="{% url 'search' %}?sort=popular" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="product-grid">
+        {% for product in featured_products %}
+        <article class="product-card product-card-premium">
+            <div class="product-image">
+                {% if product.product_image %}
+                    <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" loading="lazy">
+                {% else %}
+                    <div class="product-placeholder"><i class="fas fa-image" style="font-size: 2rem; opacity: 0.3;"></i></div>
+                {% endif %}
+                {% if product.discount_price %}
+                <span class="product-badge-discount">{% if product.discount_price %}-{{ product.discount_percentage }}%{% endif %}</span>
+                {% endif %}
+                <span class="product-badge-featured"><i class="fas fa-star"></i> Staff Pick</span>
+                <div class="product-actions-top">
+                    <button class="product-wishlist-btn" title="Add to Wishlist" onclick="toggleHomeWishlist({{ product.id }}, this)"><i class="far fa-heart"></i></button>
+                </div>
+                <div class="product-overlay">
+                    <a href="{% url 'product_detail' product.id %}" class="btn-quick-view">Quick View</a>
+                </div>
+            </div>
+            <div class="product-info">
+                <div class="product-meta">
+                    <span class="product-category">{{ product.category }}</span>
+                    {% if product.brand %}<span class="product-brand">by {{ product.brand }}</span>{% endif %}
+                </div>
+                <h3 class="product-name">
+                    <a href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a>
+                </h3>
+                <div class="product-rating">
+                    <span class="product-stars">
+                        {% for i in "12345" %}{% if forloop.counter <= product.average_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                    </span>
+                    <span class="product-review-count">({{ product.review_count }})</span>
+                </div>
+                <div class="product-footer">
+                    <div class="product-price">
+                        {% if product.discount_price %}
+                            <span class="discounted-price">Rs. {{ product.discount_price }}</span>
+                            <span class="original-price">Rs. {{ product.price }}</span>
+                        {% else %}
+                            <span class="current-price">Rs. {{ product.price }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-card-actions">
+                        <button class="btn btn-add-cart" onclick="quickAddToCart({{ product.id }})">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                        <button class="btn btn-buy-now" onclick="buyNow({{ product.id }})">
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Best Sellers -->
+{% if bestsellers %}
+<section class="section fade-in" data-scroll="fade-up">
+    <div class="section-header">
+        <h2><i class="fas fa-fire" style="color: var(--danger);"></i> Best Sellers</h2>
+        <a href="{% url 'search' %}?sort=popular" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="product-grid">
+        {% for product in bestsellers %}
+        <article class="product-card product-card-bestseller">
+            <div class="product-image">
+                {% if product.product_image %}
+                    <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" loading="lazy">
+                {% else %}
+                    <div class="product-placeholder"><i class="fas fa-image" style="font-size: 2rem; opacity: 0.3;"></i></div>
+                {% endif %}
+                <span class="product-badge-rank">{% if forloop.counter == 1 %}<i class="fas fa-crown"></i>{% elif forloop.counter == 2 %}<i class="fas fa-medal"></i>{% elif forloop.counter == 3 %}<i class="fas fa-award"></i>{% endif %} #{{ forloop.counter }}</span>
+                {% if product.discount_price %}
+                <span class="product-badge-discount">-{{ product.discount_percentage }}%</span>
+                {% endif %}
+                <div class="product-actions-top">
+                    <button class="product-wishlist-btn" title="Add to Wishlist" onclick="toggleHomeWishlist({{ product.id }}, this)"><i class="far fa-heart"></i></button>
+                </div>
+                <div class="product-overlay">
+                    <a href="{% url 'product_detail' product.id %}" class="btn-quick-view">Quick View</a>
+                </div>
+            </div>
+            <div class="product-info">
+                <div class="product-meta">
+                    <span class="product-category">{{ product.category }}</span>
+                    {% if product.brand %}<span class="product-brand">by {{ product.brand }}</span>{% endif %}
+                </div>
+                <h3 class="product-name">
+                    <a href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a>
+                </h3>
+                <div class="product-rating">
+                    <span class="product-stars">
+                        {% for i in "12345" %}{% if forloop.counter <= product.average_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                    </span>
+                    <span class="product-review-count">({{ product.review_count }})</span>
+                </div>
+                <div class="product-footer">
+                    <div class="product-price">
+                        {% if product.discount_price %}
+                            <span class="discounted-price">Rs. {{ product.discount_price }}</span>
+                            <span class="original-price">Rs. {{ product.price }}</span>
+                        {% else %}
+                            <span class="current-price">Rs. {{ product.price }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-card-actions">
+                        <button class="btn btn-add-cart" onclick="quickAddToCart({{ product.id }})">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                        <button class="btn btn-buy-now" onclick="buyNow({{ product.id }})">
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- New Arrivals -->
+{% if new_arrivals %}
+<section class="section fade-in" data-scroll="fade-up">
+    <div class="section-header">
+        <h2><i class="fas fa-certificate" style="color: var(--accent);"></i> New Arrivals</h2>
+        <a href="{% url 'search' %}?sort=newest" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="product-grid">
+        {% for product in new_arrivals %}
+        <article class="product-card product-card-new">
+            <div class="product-image">
+                {% if product.product_image %}
+                    <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" loading="lazy">
+                {% else %}
+                    <div class="product-placeholder"><i class="fas fa-image" style="font-size: 2rem; opacity: 0.3;"></i></div>
+                {% endif %}
+                <span class="product-badge-new"><i class="fas fa-sparkles"></i> NEW</span>
+                {% if product.discount_price %}
+                <span class="product-badge-discount">-{{ product.discount_percentage }}%</span>
+                {% endif %}
+                <div class="product-actions-top">
+                    <button class="product-wishlist-btn" title="Add to Wishlist" onclick="toggleHomeWishlist({{ product.id }}, this)"><i class="far fa-heart"></i></button>
+                </div>
+                <div class="product-overlay">
+                    <a href="{% url 'product_detail' product.id %}" class="btn-quick-view">Quick View</a>
+                </div>
+            </div>
+            <div class="product-info">
+                <div class="product-meta">
+                    <span class="product-category">{{ product.category }}</span>
+                    {% if product.brand %}<span class="product-brand">by {{ product.brand }}</span>{% endif %}
+                </div>
+                <h3 class="product-name">
+                    <a href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a>
+                </h3>
+                <div class="product-rating">
+                    <span class="product-stars">
+                        {% for i in "12345" %}{% if forloop.counter <= product.average_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                    </span>
+                    <span class="product-review-count">({{ product.review_count }})</span>
+                </div>
+                <div class="product-footer">
+                    <div class="product-price">
+                        {% if product.discount_price %}
+                            <span class="discounted-price">Rs. {{ product.discount_price }}</span>
+                            <span class="original-price">Rs. {{ product.price }}</span>
+                        {% else %}
+                            <span class="current-price">Rs. {{ product.price }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-card-actions">
+                        <button class="btn btn-add-cart" onclick="quickAddToCart({{ product.id }})">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                        <button class="btn btn-buy-now" onclick="buyNow({{ product.id }})">
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- All Products -->
+{% if all_products %}
+<section class="section fade-in" data-scroll="fade-up">
+    <div class="section-header">
+        <h2><i class="fas fa-store" style="color: var(--accent);"></i> All Products</h2>
+        <a href="{% url 'products' %}" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="product-grid">
+        {% for product in all_products %}
+        <article class="product-card">
+            <div class="product-image">
+                {% if product.product_image %}
+                    <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                {% else %}
+                    <div class="product-placeholder"><i class="fas fa-image" style="font-size: 2rem; opacity: 0.3;"></i></div>
+                {% endif %}
+                {% if product.discount_price %}
+                <span class="product-badge-discount">-{{ product.discount_percentage }}%</span>
+                {% endif %}
+                <span class="product-badge">{{ product.category }}</span>
+                <div class="product-actions-top">
+                    <button class="product-wishlist-btn" title="Add to Wishlist" onclick="toggleHomeWishlist({{ product.id }}, this)"><i class="far fa-heart"></i></button>
+                </div>
+                <div class="product-overlay">
+                    <a href="{% url 'product_detail' product.id %}" class="btn-quick-view">Quick View</a>
+                </div>
+            </div>
+            <div class="product-info">
+                <div class="product-meta">
+                    <span class="product-category">{{ product.category }}</span>
+                    {% if product.brand %}<span class="product-brand">by {{ product.brand }}</span>{% endif %}
+                </div>
+                <h3 class="product-name">
+                    <a href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a>
+                </h3>
+                <div class="product-rating">
+                    <span class="product-stars">
+                        {% for i in "12345" %}{% if forloop.counter <= product.average_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                    </span>
+                    <span class="product-review-count">({{ product.review_count }})</span>
+                </div>
+                <div class="product-footer">
+                    <div class="product-price">
+                        {% if product.discount_price %}
+                            <span class="discounted-price">Rs. {{ product.discount_price }}</span>
+                            <span class="original-price">Rs. {{ product.price }}</span>
+                        {% else %}
+                            <span class="current-price">Rs. {{ product.price }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-card-actions">
+                        <button class="btn btn-add-cart" onclick="quickAddToCart({{ product.id }})">
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                        <button class="btn btn-buy-now" onclick="buyNow({{ product.id }})">
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Testimonials -->
+<section class="testimonials-section section fade-in" data-scroll="fade-up">
+    <div class="section-header">
+        <h2><i class="fas fa-quote-left" style="color: var(--accent);"></i> What Our Customers Say</h2>
+    </div>
+    <div class="testimonials-grid" data-scroll-stagger data-scroll="fade-up">
+        <div class="testimonial-card">
+            <div class="testimonial-header">
+                <div class="testimonial-avatar"><i class="fas fa-user"></i></div>
+                <div class="testimonial-user">
+                    <span class="testimonial-name">Priya Sharma</span>
+                    <span class="testimonial-role">Verified Buyer</span>
+                </div>
+            </div>
+            <div class="testimonial-rating">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+            <p class="testimonial-text">"Amazing experience! The products are exactly as described, and the delivery was super fast. Highly recommend Islington Marketplace."</p>
+        </div>
+        <div class="testimonial-card">
+            <div class="testimonial-header">
+                <div class="testimonial-avatar" style="background: var(--olive-bg); color: var(--olive);"><i class="fas fa-user"></i></div>
+                <div class="testimonial-user">
+                    <span class="testimonial-name">Rajesh Kumar</span>
+                    <span class="testimonial-role">Verified Buyer</span>
+                </div>
+            </div>
+            <div class="testimonial-rating">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+            <p class="testimonial-text">"Best online shopping platform in Nepal. Great prices, genuine products, and excellent customer service. Five stars!"</p>
+        </div>
+        <div class="testimonial-card">
+            <div class="testimonial-header">
+                <div class="testimonial-avatar" style="background: var(--amber-bg); color: var(--amber);"><i class="fas fa-user"></i></div>
+                <div class="testimonial-user">
+                    <span class="testimonial-name">Anita Thapa</span>
+                    <span class="testimonial-role">Verified Buyer</span>
+                </div>
+            </div>
+            <div class="testimonial-rating">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-stroke"></i>
+            </div>
+            <p class="testimonial-text">"I love the variety and quality of products available. The flash sales are incredible — I saved so much on my last order!"</p>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="stats-section fade-in" data-scroll="fade-up" data-scroll-stagger>
+    <div class="stat-card">
+        <div class="stat-value">10K+</div>
+        <div class="stat-label">Happy Customers</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">500+</div>
+        <div class="stat-label">Products Available</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">50+</div>
+        <div class="stat-label">Trusted Sellers</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">98%</div>
+        <div class="stat-label">Positive Reviews</div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function updateCartBadge(cartTotal) {
+    const badge = document.querySelector('#cartBtn .action-badge');
+    if (badge) {
+        badge.textContent = cartTotal;
+    } else {
+        const newBadge = document.createElement('span');
+        newBadge.className = 'action-badge';
+        newBadge.textContent = cartTotal;
+        document.getElementById('cartBtn').appendChild(newBadge);
+    }
+    const mobileBadge = document.querySelector('#mobileCartBtn .action-badge');
+    if (mobileBadge) {
+        mobileBadge.textContent = cartTotal;
+    } else if (document.getElementById('mobileCartBtn')) {
+        const mb = document.createElement('span');
+        mb.className = 'action-badge';
+        mb.textContent = cartTotal;
+        document.getElementById('mobileCartBtn').appendChild(mb);
+    }
+}
+
+function toggleHomeWishlist(productId, btn) {
+    fetch('/api/wishlist/toggle/' + productId + '/', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            if (data.added) {
+                btn.classList.add('active');
+                btn.querySelector('i').className = 'fas fa-heart';
+            } else {
+                btn.classList.remove('active');
+                btn.querySelector('i').className = 'far fa-heart';
+            }
+            showToast(data.message, 'success');
+        } else {
+            window.location.href = '/login/';
+        }
+    })
+    .catch(() => {
+        window.location.href = '/login/';
+    });
+}
+
+function quickAddToCart(productId) {
+    const formData = new FormData();
+    formData.append('quantity', 1);
+    formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+    fetch('/cart/add/' + productId + '/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            updateCartBadge(data.cart_total);
+            showToast(data.message, 'success');
+        }
+    })
+    .catch(() => {});
+}
+
+function buyNow(productId) {
+    const formData = new FormData();
+    formData.append('quantity', 1);
+    formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+    fetch('/cart/add/' + productId + '/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/checkout/';
+        }
+    })
+    .catch(() => {});
+}
+
+function showToast(message, type) {
+    let c = document.querySelector('.toast-container');
+    if (!c) { c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); }
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + (type || '');
+    toast.innerHTML = '<span>' + message + '</span><button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-xmark"></i></button>';
+    c.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+}
+</script>
 {% endblock %}
