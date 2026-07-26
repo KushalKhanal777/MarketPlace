@@ -1,0 +1,511 @@
+{% extends 'master/base.html' %}
+
+{% block title %}{{ product.product_name }} - Islington Marketplace{% endblock %}
+
+{% block meta_description %}{{ product.product_description|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb-nav">
+    <ol>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'products' %}">Products</a></li>
+        <li><a href="{% url 'products' %}?category={{ product.category.slug }}">{{ product.category }}</a></li>
+        <li>{{ product.product_name }}</li>
+    </ol>
+</nav>
+
+<section class="product-detail fade-in">
+    <div class="detail-grid">
+        <div class="detail-image-section">
+            <div class="detail-image" id="mainImage">
+                {% if product.product_image %}
+                    <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" class="detail-product-img" id="mainProductImg" loading="eager">
+                {% else %}
+                    <div class="detail-placeholder">
+                        <i class="fas fa-image" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <span>No Image Available</span>
+                    </div>
+                {% endif %}
+                {% if product.discount_price %}
+                <span class="product-badge-discount">-{{ product.discount_percentage }}%</span>
+                {% endif %}
+                <span class="product-badge">{{ product.category }}</span>
+            </div>
+        </div>
+
+        <div class="detail-info-section">
+            <div class="detail-info">
+                <div class="detail-meta-top">
+                    <span class="detail-category">{{ product.category }}</span>
+                    {% if product.brand %}<span class="product-brand" style="font-size: 0.8rem; color: var(--ink-muted);">by {{ product.brand }}</span>{% endif %}
+                    {% if product.in_stock %}
+                        <span class="stock-badge in-stock"><i class="fas fa-check-circle"></i> In Stock</span>
+                    {% else %}
+                        <span class="stock-badge out-of-stock"><i class="fas fa-times-circle"></i> Out of Stock</span>
+                    {% endif %}
+                </div>
+
+                <h1 class="detail-title">{{ product.product_name }}</h1>
+
+                <div class="detail-rating">
+                    <span class="detail-stars">
+                        {% for i in "12345" %}{% if forloop.counter <= product.average_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                    </span>
+                    <span class="detail-rating-text">{{ product.average_rating }} out of 5 ({{ product.review_count }} review{{ product.review_count|pluralize }})</span>
+                </div>
+
+                <div class="detail-price-section">
+                    <div class="detail-price">
+                        {% if product.discount_price %}
+                            <span class="discounted-price">Rs. {{ product.discount_price }}</span>
+                            <span class="original-price">Rs. {{ product.price }}</span>
+                            <span class="discount-badge">Save {{ product.discount_percentage }}%</span>
+                        {% else %}
+                            <span class="current-price">Rs. {{ product.price }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <p class="detail-description">{{ product.product_description }}</p>
+
+                <div class="detail-stock-info">
+                    <div class="stock-indicator">
+                        {% if product.in_stock %}
+                            <i class="fas fa-check-circle"></i>
+                            <span>{{ product.stock }} unit{{ product.stock|pluralize }} available</span>
+                        {% else %}
+                            <i class="fas fa-times-circle" style="color: var(--rose);"></i>
+                            <span style="color: var(--rose);">Currently unavailable</span>
+                        {% endif %}
+                    </div>
+                    {% if product.stock > 0 and product.stock <= 10 %}
+                    <div class="stock-progress">
+                        <div class="stock-progress-bar">
+                            <div class="stock-progress-fill {% if product.stock <= 3 %}low{% elif product.stock <= 7 %}medium{% else %}high{% endif %}" 
+                                 style="width: {{ product.stock }}0%"></div>
+                        </div>
+                        <div class="stock-progress-text">Only {{ product.stock }} left - order soon!</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if product.in_stock %}
+                <div style="margin-bottom: var(--sp-5);">
+                    <label class="form-label">Quantity</label>
+                    <div class="quantity-control">
+                        <button type="button" class="quantity-btn" onclick="changeQty(-1)">-</button>
+                        <input type="number" class="quantity-input" id="qtyInput" value="1" min="1" max="{{ product.stock }}">
+                        <button type="button" class="quantity-btn" onclick="changeQty(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="detail-actions">
+                    <button class="btn btn-primary btn-lg" onclick="addToCart({{ product.id }})">
+                        <i class="fas fa-bag-shopping"></i> Add to Cart
+                    </button>
+                    <button class="btn btn-accent btn-lg" onclick="buyNow({{ product.id }})">
+                        <i class="fas fa-bolt"></i> Buy Now
+                    </button>
+                    <button class="detail-wishlist-btn" onclick="toggleDetailWishlist({{ product.id }}, this)" title="Add to Wishlist">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    {% if user.is_authenticated %}
+                    <button class="detail-wishlist-btn" onclick="document.getElementById('reportModal').style.display='flex'" title="Report this product" style="color: var(--danger);">
+                        <i class="fas fa-flag"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="detail-actions">
+                    <button class="btn btn-outline btn-lg" disabled>
+                        <i class="fas fa-bell"></i> Notify When Available
+                    </button>
+                </div>
+                {% endif %}
+
+                <div class="detail-share">
+                    <span>Share:</span>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="share-btn" title="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ product.product_name }}" target="_blank" class="share-btn" title="Share on Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://wa.me/?text={{ product.product_name }}%20{{ request.build_absolute_uri }}" target="_blank" class="share-btn" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <button class="share-btn" title="Copy link" onclick="copyLink()"><i class="fas fa-link"></i></button>
+                </div>
+
+                <div class="detail-features">
+                    <div class="feature-item"><i class="fas fa-truck"></i><span>Free shipping on orders over Rs. 5,000</span></div>
+                    <div class="feature-item"><i class="fas fa-undo"></i><span>30-day return policy</span></div>
+                    <div class="feature-item"><i class="fas fa-shield-halved"></i><span>Secure checkout guarantee</span></div>
+                    <div class="feature-item"><i class="fas fa-tag"></i><span>Best price guaranteed</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Reviews Section -->
+<section class="reviews-section fade-in">
+    <h2 class="section-title" style="margin-bottom: var(--sp-6);">Customer Reviews</h2>
+
+    <div class="reviews-summary">
+        <div class="reviews-avg">
+            <div class="reviews-avg-number">{{ product.average_rating }}</div>
+            <div class="reviews-avg-stars">
+                {% for i in "12345" %}{% if forloop.counter <= product.average_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+            </div>
+            <div class="reviews-avg-count">{{ product.review_count }} review{{ product.review_count|pluralize }}</div>
+        </div>
+        <div class="reviews-bars">
+            {% for pct in rating_distribution %}
+            <div class="review-bar">
+                <span class="review-bar-label">{{ forloop.counter }} star</span>
+                <div class="review-bar-track">
+                    <div class="review-bar-fill" style="width: {{ pct }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Review List -->
+    {% for review in product.reviews.all %}
+    <div class="review-card">
+        <div class="review-header">
+            <div class="review-user">
+                <div class="review-avatar">{{ review.user.first_name.0|default:review.user.username.0|upper }}</div>
+                <div>
+                    <div class="review-user-name">{{ review.user.get_full_name|default:review.user.username }}</div>
+                    <div class="review-user-date">{{ review.created_at|date:"M d, Y" }}</div>
+                </div>
+            </div>
+            <div class="review-stars">
+                {% for i in "12345" %}{% if forloop.counter <= review.rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+            </div>
+        </div>
+        {% if review.title %}<div class="review-title">{{ review.title }}</div>{% endif %}
+        <div class="review-text">{{ review.comment }}</div>
+        <div class="review-helpful">
+            <span>Was this helpful?</span>
+            <button><i class="fas fa-thumbs-up"></i> Yes ({{ review.helpful_count }})</button>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state" style="padding: var(--sp-8);">
+        <div class="empty-icon"><i class="fas fa-comments" style="font-size: 1.5rem;"></i></div>
+        <h3>No Reviews Yet</h3>
+        <p>Be the first to review this product!</p>
+    </div>
+    {% endfor %}
+
+    <!-- Write Review -->
+    {% if user.is_authenticated %}
+    <div class="write-review">
+        <h3><i class="fas fa-pen"></i> Write a Review</h3>
+        <form method="POST" action="{% url 'product_detail' product.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Your Rating *</label>
+                <div class="star-rating-input" id="starRating">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
+                </div>
+                <input type="hidden" name="rating" id="ratingInput" value="0" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="review_title">Review Title</label>
+                <input type="text" name="title" id="review_title" class="form-input" placeholder="Summarize your review">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="review_comment">Your Review *</label>
+                <textarea name="comment" id="review_comment" class="form-textarea" placeholder="Tell others about your experience with this product..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Review</button>
+        </form>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: var(--sp-6); background: var(--stone-warm); border-radius: var(--r-lg); margin-top: var(--sp-6);">
+        <p style="color: var(--ink-muted); margin-bottom: var(--sp-3);">Want to write a review?</p>
+        <a href="{% url 'login' %}" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Sign In to Review</a>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Related Products -->
+{% if related_products %}
+<section class="related-products fade-in">
+    <div class="section-header">
+        <span class="section-badge"><i class="fas fa-store"></i> Related</span>
+        <h2 class="section-title">You May Also Like</h2>
+    </div>
+    <div class="product-grid">
+        {% for rp in related_products %}
+        <article class="product-card">
+            <div class="product-image">
+                {% if rp.product_image %}
+                    <img src="{{ rp.product_image.url }}" alt="{{ rp.product_name }}" loading="lazy">
+                {% else %}
+                    <div class="product-placeholder"><i class="fas fa-image" style="font-size: 2rem; opacity: 0.3;"></i></div>
+                {% endif %}
+                {% if rp.discount_price %}
+                <span class="product-badge-discount">-{{ rp.discount_percentage }}%</span>
+                {% endif %}
+                <div class="product-overlay"><a href="{% url 'product_detail' rp.id %}" class="btn-quick-view">Quick View</a></div>
+            </div>
+            <div class="product-info">
+                <div class="product-meta"><span class="product-category">{{ rp.category }}</span></div>
+                <h3 class="product-name"><a href="{% url 'product_detail' rp.id %}">{{ rp.product_name }}</a></h3>
+                <div class="product-rating">
+                    <span class="product-stars">
+                        {% for i in "12345" %}{% if forloop.counter <= rp.average_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                    </span>
+                    <span class="product-review-count">({{ rp.review_count }})</span>
+                </div>
+                <div class="product-footer">
+                    <div class="product-price">
+                        {% if rp.discount_price %}
+                            <span class="original-price">Rs. {{ rp.price }}</span>
+                            <span class="discounted-price">Rs. {{ rp.discount_price }}</span>
+                        {% else %}
+                            <span class="current-price">Rs. {{ rp.price }}</span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'product_detail' rp.id %}" class="btn btn-sm">View</a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showToast(message, type) {
+    let c = document.querySelector('.toast-container');
+    if (!c) { c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); }
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + (type || '');
+    toast.innerHTML = '<span>' + message + '</span><button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-xmark"></i></button>';
+    c.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+}
+
+function updateCartBadge(cartTotal) {
+    const badge = document.querySelector('#cartBtn .action-badge');
+    if (badge) { badge.textContent = cartTotal; }
+    else {
+        const nb = document.createElement('span');
+        nb.className = 'action-badge';
+        nb.textContent = cartTotal;
+        document.getElementById('cartBtn').appendChild(nb);
+    }
+    const mobileBadge = document.querySelector('#mobileCartBtn .action-badge');
+    if (mobileBadge) { mobileBadge.textContent = cartTotal; }
+    else if (document.getElementById('mobileCartBtn')) {
+        const mb = document.createElement('span');
+        mb.className = 'action-badge';
+        mb.textContent = cartTotal;
+        document.getElementById('mobileCartBtn').appendChild(mb);
+    }
+}
+
+// Quantity Control
+function changeQty(delta) {
+    const input = document.getElementById('qtyInput');
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    if (val > parseInt(input.max)) val = parseInt(input.max);
+    input.value = val;
+}
+
+// Star Rating Input
+const starRating = document.getElementById('starRating');
+const ratingInput = document.getElementById('ratingInput');
+if (starRating) {
+    starRating.querySelectorAll('i').forEach(star => {
+        star.addEventListener('mouseenter', function() {
+            const rating = this.dataset.rating;
+            starRating.querySelectorAll('i').forEach((s, i) => {
+                s.className = i < rating ? 'fas fa-star active' : 'far fa-star';
+            });
+        });
+        star.addEventListener('click', function() {
+            ratingInput.value = this.dataset.rating;
+        });
+    });
+    starRating.addEventListener('mouseleave', function() {
+        const current = ratingInput.value;
+        starRating.querySelectorAll('i').forEach((s, i) => {
+            s.className = i < current ? 'fas fa-star active' : 'far fa-star';
+        });
+    });
+}
+
+// Add to Cart (AJAX)
+function addToCart(productId) {
+    const qty = document.getElementById('qtyInput').value;
+    const btn = event.target.closest('.btn');
+
+    const formData = new FormData();
+    formData.append('quantity', qty);
+    formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+    fetch('/cart/add/' + productId + '/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            updateCartBadge(data.cart_total);
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Added!';
+            btn.classList.add('btn-success');
+            setTimeout(() => { btn.innerHTML = originalText; btn.classList.remove('btn-success'); }, 2000);
+        }
+    })
+    .catch(() => { window.location.href = '/cart/add/' + productId + '/'; });
+}
+
+// Buy Now
+function buyNow(productId) {
+    const qty = document.getElementById('qtyInput').value;
+    const formData = new FormData();
+    formData.append('quantity', qty);
+    formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+    fetch('/cart/add/' + productId + '/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/checkout/';
+        }
+    })
+    .catch(() => {});
+}
+
+// Wishlist Toggle
+function toggleDetailWishlist(productId, btn) {
+    fetch('/api/wishlist/toggle/' + productId + '/', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            if (data.added) {
+                btn.classList.add('active');
+                btn.querySelector('i').className = 'fas fa-heart';
+            } else {
+                btn.classList.remove('active');
+                btn.querySelector('i').className = 'far fa-heart';
+            }
+            showToast(data.message, 'success');
+        } else {
+            window.location.href = '/login/';
+        }
+    })
+    .catch(() => {
+        window.location.href = '/login/';
+    });
+}
+
+// Copy Link
+function copyLink() {
+    navigator.clipboard.writeText(window.location.href);
+    const btn = event.target.closest('.share-btn');
+    btn.innerHTML = '<i class="fas fa-check"></i>';
+    setTimeout(() => { btn.innerHTML = '<i class="fas fa-link"></i>'; }, 2000);
+}
+
+// Image Zoom on Hover
+const mainImage = document.getElementById('mainImage');
+const mainImg = document.getElementById('mainProductImg');
+if (mainImage && mainImg) {
+    mainImage.addEventListener('mousemove', function(e) {
+        const rect = this.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width * 100;
+        const y = (e.clientY - rect.top) / rect.height * 100;
+        mainImg.style.transformOrigin = x + '% ' + y + '%';
+    });
+    mainImage.addEventListener('mouseenter', function() {
+        mainImg.style.transform = 'scale(1.5)';
+    });
+    mainImage.addEventListener('mouseleave', function() {
+        mainImg.style.transform = 'scale(1)';
+        mainImg.style.transformOrigin = 'center center';
+    });
+}
+</script>
+
+<!-- Report Modal -->
+{% if user.is_authenticated %}
+<div id="reportModal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; padding: var(--sp-4);">
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl); padding: var(--sp-8); max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--sp-5);">
+            <h3 style="font-size: var(--text-lg); font-weight: 700;"><i class="fas fa-flag" style="color: var(--danger);"></i> Report Product</h3>
+            <button onclick="document.getElementById('reportModal').style.display='none'" style="background:none; border:none; font-size: 1.2rem; cursor:pointer; color: var(--ink-muted);"><i class="fas fa-xmark"></i></button>
+        </div>
+        <form method="POST" action="{% url 'report_content' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+            <div class="form-group">
+                <label class="form-label">Reason for Report *</label>
+                <select name="reason" class="form-input" required>
+                    <option value="">Select a reason...</option>
+                    <option value="fraud">Fraud / Scam</option>
+                    <option value="counterfeit">Counterfeit / Fake Product</option>
+                    <option value="inappropriate">Inappropriate Content</option>
+                    <option value="age_restricted">Age-Restricted Content (Underage)</option>
+                    <option value="prohibited">Prohibited Item</option>
+                    <option value="misleading">Misleading Description</option>
+                    <option value="harassment">Harassment / Hate Speech</option>
+                    <option value="spam">Spam / Fake Reviews</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description *</label>
+                <textarea name="description" class="form-input" rows="4" placeholder="Please describe the issue in detail..." required style="resize: vertical;"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Evidence (optional)</label>
+                <input type="file" name="evidence_image" class="form-input" accept="image/*">
+            </div>
+            <div style="display:flex; gap: var(--sp-3); justify-content:flex-end;">
+                <button type="button" onclick="document.getElementById('reportModal').style.display='none'" class="btn" style="padding: 10px 20px;">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="padding: 10px 20px;"><i class="fas fa-paper-plane"></i> Submit Report</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
