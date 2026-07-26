@@ -1,12 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <circle cx="32" cy="32" r="30" fill="#fef0e0"/>
-  <circle cx="32" cy="28" r="12" fill="none" stroke="#f97316" stroke-width="2.5"/>
-  <path d="M20 28 C20 28 26 20 32 20 C38 20 44 28 44 28" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
-  <path d="M20 28 C20 28 26 36 32 36 C38 36 44 28 44 28" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
-  <line x1="32" y1="16" x2="32" y2="40" stroke="#f97316" stroke-width="1.5"/>
-  <line x1="20" y1="28" x2="44" y2="28" stroke="#f97316" stroke-width="1.5"/>
-  <path d="M28 44 L26 50" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
-  <path d="M36 44 L38 50" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
-  <path d="M24 50 L30 50" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
-  <path d="M34 50 L40 50" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="24" cy="24" r="16"/>
+  <path d="M24 8 C20 14 20 18 24 24 C28 18 28 14 24 8Z" opacity="0.3" fill="#f97316" stroke="none"/>
+  <path d="M8 24 C14 20 18 20 24 24 C18 28 14 28 8 24Z" opacity="0.3" fill="#f97316" stroke="none"/>
+  <path d="M24 8 C28 14 28 18 24 24 C20 18 20 14 24 8Z"/>
+  <path d="M8 24 C14 28 18 28 24 24 C18 20 14 20 8 24Z"/>
+  <path d="M40 24 C34 20 30 20 24 24 C30 28 34 28 40 24Z"/>
+  <path d="M24 40 C20 34 20 30 24 24 C28 30 28 34 24 40Z"/>
 </svg>
