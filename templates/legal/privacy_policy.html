@@ -1,0 +1,154 @@
+{% extends 'master/base.html' %}
+
+{% block title %}Privacy Policy - Islington Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+.legal-page { max-width: 860px; margin: 0 auto; }
+.legal-page .page-header { margin-bottom: var(--sp-8); }
+.legal-content {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-xl); padding: var(--sp-10);
+}
+.legal-content h2 {
+    font-family: var(--font-display); font-size: var(--text-lg);
+    font-weight: 600; color: var(--ink); margin: var(--sp-8) 0 var(--sp-4);
+    display: flex; align-items: center; gap: var(--sp-2);
+}
+.legal-content h2:first-child { margin-top: 0; }
+.legal-content h2 i { color: var(--accent); font-size: var(--text-base); }
+.legal-content h3 {
+    font-size: var(--text-base); font-weight: 600; color: var(--ink-soft);
+    margin: var(--sp-5) 0 var(--sp-3);
+}
+.legal-content p {
+    font-size: var(--text-sm); color: var(--ink-muted);
+    line-height: 1.7; margin-bottom: var(--sp-3);
+}
+.legal-content ul {
+    margin: var(--sp-3) 0; padding-left: var(--sp-6);
+}
+.legal-content li {
+    font-size: var(--text-sm); color: var(--ink-muted);
+    line-height: 1.7; margin-bottom: var(--sp-2);
+}
+.legal-meta {
+    font-size: var(--text-xs); color: var(--ink-faint);
+    text-align: center; margin-top: var(--sp-4); padding-top: var(--sp-4);
+    border-top: 1px solid var(--border-light);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content" style="padding-top: var(--sp-8); padding-bottom: var(--sp-12);">
+    <div class="legal-page fade-in">
+        <section class="page-header">
+            <div class="page-header-content">
+                <span class="section-badge">Legal</span>
+                <h1>Privacy Policy</h1>
+                <p>How we collect, use, and protect your information</p>
+            </div>
+        </section>
+
+        <div class="legal-content">
+            <h2><i class="fas fa-circle-info"></i> Introduction</h2>
+            <p>Islington Marketplace ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform, including our website, mobile applications, and related services (collectively, the "Service").</p>
+            <p>By using the Service, you agree to the collection and use of information in accordance with this policy. If you do not agree, please discontinue use of the Service.</p>
+
+            <h2><i class="fas fa-database"></i> Information We Collect</h2>
+            <h3>Personal Information</h3>
+            <p>We may collect personally identifiable information that you voluntarily provide, including:</p>
+            <ul>
+                <li>Name, email address, phone number, and shipping address</li>
+                <li>Date of birth and age verification data</li>
+                <li>Payment information (processed securely through third-party payment processors)</li>
+                <li>Government-issued identification documents for seller verification (KYC)</li>
+                <li>Business registration details for seller accounts</li>
+            </ul>
+            <h3>Automatically Collected Information</h3>
+            <p>When you access the Service, we may automatically collect:</p>
+            <ul>
+                <li>Device information (browser type, operating system, device identifiers)</li>
+                <li>Log data (IP address, access times, pages viewed, referring URLs)</li>
+                <li>Location data (approximate geographic location based on IP address)</li>
+                <li>Usage data (features used, search queries, interactions with products)</li>
+            </ul>
+
+            <h2><i class="fas fa-gears"></i> How We Use Your Information</h2>
+            <p>We use the collected information for the following purposes:</p>
+            <ul>
+                <li>To provide, maintain, and improve the Service</li>
+                <li>To process transactions and send related information (confirmations, invoices)</li>
+                <li>To verify seller identities through KYC processes</li>
+                <li>To send administrative notifications (service updates, security alerts)</li>
+                <li>To provide customer support and respond to inquiries</li>
+                <li>To personalize your experience and provide relevant product recommendations</li>
+                <li>To detect, prevent, and address fraud, security breaches, and technical issues</li>
+                <li>To comply with legal obligations and enforce our terms</li>
+                <li>To send promotional communications (with your opt-in consent)</li>
+            </ul>
+
+            <h2><i class="fas fa-share-nodes"></i> Data Sharing</h2>
+            <p>We do not sell your personal information. We may share your data with:</p>
+            <ul>
+                <li><strong>Service Providers:</strong> Third-party vendors who assist with payment processing, shipping, analytics, and cloud hosting</li>
+                <li><strong>Business Partners:</strong> Trusted partners who help us operate the platform and provide services to you</li>
+                <li><strong>Legal Requirements:</strong> When required by law, court order, or government regulation</li>
+                <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets, with appropriate notice</li>
+                <li><strong>With Your Consent:</strong> When you explicitly authorize sharing for a specific purpose</li>
+            </ul>
+
+            <h2><i class="fas fa-lock"></i> Data Security</h2>
+            <p>We implement industry-standard security measures to protect your personal information, including:</p>
+            <ul>
+                <li>Encryption of data in transit (TLS/SSL) and at rest</li>
+                <li>Regular security audits and vulnerability assessments</li>
+                <li>Access controls and authentication mechanisms for internal systems</li>
+                <li>PCI DSS compliance for payment card data handling</li>
+                <li>Incident response procedures for data breach notification</li>
+            </ul>
+            <p>While we strive to protect your data, no method of transmission over the Internet or electronic storage is 100% secure. We encourage you to use strong passwords and enable two-factor authentication where available.</p>
+
+            <h2><i class="fas fa-cookie"></i> Cookies</h2>
+            <p>We use cookies and similar tracking technologies to enhance your experience:</p>
+            <ul>
+                <li><strong>Essential Cookies:</strong> Required for basic site functionality (session management, cart)</li>
+                <li><strong>Analytics Cookies:</strong> Help us understand how visitors interact with the platform</li>
+                <li><strong>Preference Cookies:</strong> Remember your settings and preferences (language, theme)</li>
+                <li><strong>Marketing Cookies:</strong> Used to deliver relevant advertisements (with consent)</li>
+            </ul>
+            <p>You can control cookie preferences through your browser settings. Disabling essential cookies may affect site functionality.</p>
+
+            <h2><i class="fas fa-user-shield"></i> Your Rights</h2>
+            <p>Depending on your jurisdiction, you may have the following rights:</p>
+            <ul>
+                <li><strong>Access:</strong> Request a copy of the personal data we hold about you</li>
+                <li><strong>Correction:</strong> Request correction of inaccurate or incomplete data</li>
+                <li><strong>Deletion:</strong> Request deletion of your personal data (subject to legal obligations)</li>
+                <li><strong>Portability:</strong> Request your data in a structured, machine-readable format</li>
+                <li><strong>Objection:</strong> Object to processing based on legitimate interests</li>
+                <li><strong>Withdraw Consent:</strong> Withdraw previously given consent at any time</li>
+            </ul>
+            <p>To exercise these rights, contact us at <a href="mailto:support@islingtonmarketplace.com" style="color: var(--primary);">support@islingtonmarketplace.com</a>.</p>
+
+            <h2><i class="fas fa-child"></i> Children's Privacy</h2>
+            <p>The Service is not intended for individuals under the age of 13. We do not knowingly collect personal information from children under 13. If we become aware that we have collected data from a child under 13, we will take steps to delete it promptly.</p>
+            <p>For age-restricted content and categories, we require users to verify they are at least 18 years of age.</p>
+
+            <h2><i class="fas fa-pen-to-square"></i> Changes to This Policy</h2>
+            <p>We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the updated policy on this page with a revised "Last Updated" date. We encourage you to review this policy periodically.</p>
+
+            <h2><i class="fas fa-envelope"></i> Contact Us</h2>
+            <p>If you have questions about this Privacy Policy or our data practices, please contact us:</p>
+            <ul>
+                <li><strong>Email:</strong> <a href="mailto:support@islingtonmarketplace.com" style="color: var(--primary);">support@islingtonmarketplace.com</a></li>
+                <li><strong>Phone:</strong> +977-1-4567890</li>
+                <li><strong>Address:</strong> Kathmandu, Nepal</li>
+            </ul>
+
+            <div class="legal-meta">Last Updated: July 26, 2026</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
