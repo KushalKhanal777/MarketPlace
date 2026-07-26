@@ -1,0 +1,75 @@
+{% extends 'master/base.html' %}
+
+{% block title %}Settings - Islington Marketplace{% endblock %}
+
+{% block content %}
+<div class="dashboard-bg fade-in">
+    <div class="dashboard-bg-content">
+        <h1>Account Settings</h1>
+        <p>Manage your account preferences and security</p>
+    </div>
+</div>
+
+<div class="dashboard-layout fade-in">
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">{{ user.first_name.0|default:user.username.0|upper }}</div>
+            <div>
+                <div class="sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="sidebar-user-email">{{ user.email }}</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="sidebar-nav-item"><i class="fas fa-gauge-high"></i> Overview</a>
+            <a href="{% url 'dashboard_profile' %}" class="sidebar-nav-item"><i class="fas fa-user"></i> Profile</a>
+            <a href="{% url 'dashboard_orders' %}" class="sidebar-nav-item"><i class="fas fa-box"></i> Orders</a>
+            <a href="{% url 'dashboard_earnings' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_earnings' %}active{% endif %}"><i class="fas fa-wallet"></i> Earnings</a>
+            <a href="{% url 'dashboard_payment_settings' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_payment_settings' %}active{% endif %}"><i class="fas fa-credit-card"></i> Payment Settings</a>
+            <a href="{% url 'dashboard_wishlist' %}" class="sidebar-nav-item"><i class="fas fa-heart"></i> Wishlist</a>
+            <a href="{% url 'dashboard_reviews' %}" class="sidebar-nav-item"><i class="fas fa-star"></i> Reviews</a>
+            <a href="{% url 'dashboard_settings' %}" class="sidebar-nav-item active"><i class="fas fa-gear"></i> Settings</a>
+            <div class="sidebar-nav-divider"></div>
+            <a href="{% url 'logout' %}" class="sidebar-nav-item danger"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <div class="dashboard-content">
+        <div class="dashboard-card" style="margin-bottom: var(--sp-6);">
+            <div class="dashboard-card-header">
+                <h3>Change Password</h3>
+            </div>
+            <div style="padding: var(--sp-6);">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="change_password">
+                    <div class="form-group">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" name="current_password" class="form-input" placeholder="Enter current password" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input type="password" name="new_password" class="form-input" placeholder="Enter new password" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" name="confirm_password" class="form-input" placeholder="Confirm new password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Update Password</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h3 style="color: var(--danger);">Danger Zone</h3>
+            </div>
+            <div style="padding: var(--sp-6);">
+                <p style="font-size: var(--text-sm); color: var(--ink-muted); margin-bottom: var(--sp-4);">Once you delete your account, there is no going back. Please be certain.</p>
+                <button class="btn btn-danger" disabled style="opacity: 0.5; cursor: not-allowed;">
+                    <i class="fas fa-trash"></i> Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
