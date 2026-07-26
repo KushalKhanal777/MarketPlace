@@ -1,0 +1,75 @@
+{% extends 'master/base.html' %}
+
+{% block title %}My Orders - Islington Marketplace{% endblock %}
+
+{% block content %}
+<div class="dashboard-bg fade-in">
+    <div class="dashboard-bg-content">
+        <h1>My Orders</h1>
+        <p>Track and manage your orders</p>
+    </div>
+</div>
+
+<div class="dashboard-layout fade-in">
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">{{ user.first_name.0|default:user.username.0|upper }}</div>
+            <div>
+                <div class="sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="sidebar-user-email">{{ user.email }}</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="sidebar-nav-item"><i class="fas fa-gauge-high"></i> Overview</a>
+            <a href="{% url 'dashboard_profile' %}" class="sidebar-nav-item"><i class="fas fa-user"></i> Profile</a>
+            <a href="{% url 'dashboard_orders' %}" class="sidebar-nav-item active"><i class="fas fa-box"></i> Orders</a>
+            <a href="{% url 'dashboard_earnings' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_earnings' %}active{% endif %}"><i class="fas fa-wallet"></i> Earnings</a>
+            <a href="{% url 'dashboard_payment_settings' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_payment_settings' %}active{% endif %}"><i class="fas fa-credit-card"></i> Payment Settings</a>
+            <a href="{% url 'dashboard_wishlist' %}" class="sidebar-nav-item"><i class="fas fa-heart"></i> Wishlist</a>
+            <a href="{% url 'dashboard_reviews' %}" class="sidebar-nav-item"><i class="fas fa-star"></i> Reviews</a>
+            <a href="{% url 'dashboard_settings' %}" class="sidebar-nav-item"><i class="fas fa-gear"></i> Settings</a>
+            <div class="sidebar-nav-divider"></div>
+            <a href="{% url 'logout' %}" class="sidebar-nav-item danger"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <div class="dashboard-content">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h3>All Orders</h3>
+            </div>
+            {% if orders %}
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Date</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td><strong>#{{ order.order_number }}</strong></td>
+                        <td>{{ order.created_at|date:"M d, Y" }}</td>
+                        <td>{{ order.items.count }} item{{ order.items.count|pluralize }}</td>
+                        <td><strong>Rs. {{ order.total_amount }}</strong></td>
+                        <td><span class="order-status {{ order.status }}">{{ order.get_status_display }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state" style="padding: var(--sp-8);">
+                <div class="empty-icon"><i class="fas fa-box" style="font-size: 1.5rem;"></i></div>
+                <h3>No orders yet</h3>
+                <p>Your orders will appear here once you make a purchase</p>
+                <a href="{% url 'products' %}" class="btn btn-primary"><i class="fas fa-shopping-bag"></i> Start Shopping</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
