@@ -1,14 +1,608 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}Islington Marketplace - Premium eCommerce platform for quality products{% endblock %}">
     <title>{% block title %}Islington Marketplace{% endblock %}</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4.0">
+
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header><h1> Welcome to the Marketplace </h1></header>
-    {%block content%} {% endblock %}
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <span><i class="fas fa-truck"></i> Free shipping on orders over Rs. 5,000</span>
+                <span class="top-bar-divider">|</span>
+                <span><i class="fas fa-rotate-left"></i> 30-day return policy</span>
+            </div>
+            <div class="top-bar-right">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}"><i class="fas fa-user"></i> My Account</a>
+                {% else %}
+                    <a href="{% url 'login' %}"><i class="fas fa-arrow-right-to-bracket"></i> Login</a>
+                    <span class="top-bar-divider">|</span>
+                    <a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <!-- Brand -->
+                <div class="nav-brand">
+                    <a href="{% url 'home' %}" aria-label="Islington Marketplace Home">
+                        <img src="{% static 'images/logo.png' %}?v=1" alt="Islington Marketplace" class="brand-logo">
+                        <span class="brand-text">Islington Marketplace</span>
+                    </a>
+                </div>
+
+                <!-- Mobile Toggle -->
+                <button class="mobile-nav-toggle" aria-label="Toggle navigation" id="navToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <!-- Nav Actions -->
+                <div class="nav-actions">
+                    <div class="nav-links">
+                        <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                            <i class="fas fa-house"></i> Home
+                        </a>
+                        <a href="{% url 'products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}">
+                            <i class="fas fa-store"></i> Products
+                        </a>
+                        <a href="{% url 'become_seller' %}" class="nav-link {% if request.resolver_match.url_name == 'become_seller' %}active{% endif %}">
+                            <i class="fas fa-tag"></i> Sell
+                        </a>
+                        <a href="{% url 'blog' %}" class="nav-link {% if request.resolver_match.url_name == 'blog' or request.resolver_match.url_name == 'blog_detail' %}active{% endif %}">
+                            <i class="fas fa-newspaper"></i> Blog
+                        </a>
+                    </div>
+
+                    <!-- Search Bar (right side) -->
+                    <div class="nav-search" id="navSearch">
+                        <form action="{% url 'search' %}" method="GET" class="search-form" id="searchForm">
+                            <div class="search-input-wrapper">
+                                <i class="fas fa-magnifying-glass search-icon"></i>
+                                <input type="text" name="q" placeholder="Search products..."
+                                       class="search-input" id="searchInput" autocomplete="off"
+                                       value="{{ query|default:'' }}" aria-label="Search products">
+                                <button type="submit" class="search-btn">Search</button>
+                            </div>
+                            <div class="search-suggestions" id="searchSuggestions" role="listbox"></div>
+                        </form>
+                    </div>
+
+                    <a href="{% url 'search' %}" class="nav-action-btn mobile-search-toggle" aria-label="Search">
+                        <i class="fas fa-magnifying-glass"></i>
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard_wishlist' %}" class="nav-action-btn" aria-label="Wishlist">
+                            <i class="fas fa-heart"></i>
+                            {% if wishlist_count %}<span class="action-badge">{{ wishlist_count }}</span>{% endif %}
+                        </a>
+                    {% endif %}
+
+                    <a href="{% url 'cart_detail' %}" class="nav-action-btn" aria-label="Cart" id="cartBtn">
+                        <i class="fas fa-bag-shopping"></i>
+                        {% if cart_item_count %}<span class="action-badge">{{ cart_item_count }}</span>{% endif %}
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        <div class="user-menu" id="userDropdown">
+                            <button class="user-dropdown-btn" aria-label="Account menu" aria-expanded="false">
+                                <div class="user-avatar">{{ user.first_name.0|default:user.username.0|upper }}</div>
+                                <span class="user-avatar-name">{{ user.first_name|default:user.username|truncatechars:12 }}</span>
+                                <i class="fas fa-chevron-down" style="font-size: 10px; color: var(--ink-muted);"></i>
+                            </button>
+                            <div class="user-dropdown" role="menu">
+                                <div class="user-dropdown-header">
+                                    <div class="user-dropdown-name">{{ user.get_full_name|default:user.username }}</div>
+                                    <div class="user-dropdown-email">{{ user.email }}</div>
+                                </div>
+                                <a href="{% url 'dashboard' %}" class="user-dropdown-item" role="menuitem">
+                                    <i class="fas fa-gauge-high"></i> Dashboard
+                                </a>
+                                <a href="{% url 'dashboard_orders' %}" class="user-dropdown-item" role="menuitem">
+                                    <i class="fas fa-box"></i> My Orders
+                                </a>
+                                <a href="{% url 'dashboard_wishlist' %}" class="user-dropdown-item" role="menuitem">
+                                    <i class="fas fa-heart"></i> Wishlist
+                                </a>
+                                <a href="{% url 'dashboard_profile' %}" class="user-dropdown-item" role="menuitem">
+                                    <i class="fas fa-user"></i> Profile
+                                </a>
+                                <a href="{% url 'dashboard_settings' %}" class="user-dropdown-item" role="menuitem">
+                                    <i class="fas fa-gear"></i> Settings
+                                </a>
+                                <div class="user-dropdown-divider"></div>
+                                <a href="{% url 'logout' %}" class="user-dropdown-item danger" role="menuitem">
+                                    <i class="fas fa-right-from-bracket"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="nav-action-btn" aria-label="Login">
+                            <i class="fas fa-circle-user"></i>
+                        </a>
+                    {% endif %}
+
+                    <button class="dark-mode-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Nav Overlay -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+    <!-- Mobile Nav -->
+    <div class="mobile-nav" id="mobileNav">
+        <a href="{% url 'home' %}" class="mobile-nav-link"><i class="fas fa-house"></i> Home</a>
+        <a href="{% url 'products' %}" class="mobile-nav-link"><i class="fas fa-store"></i> Products</a>
+        <a href="{% url 'become_seller' %}" class="mobile-nav-link"><i class="fas fa-tag"></i> Sell</a>
+        <a href="{% url 'blog' %}" class="mobile-nav-link"><i class="fas fa-newspaper"></i> Blog</a>
+        <a href="{% url 'cart_detail' %}" class="mobile-nav-link"><i class="fas fa-bag-shopping"></i> Cart</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="mobile-nav-link"><i class="fas fa-gauge-high"></i> Dashboard</a>
+            <a href="{% url 'dashboard_orders' %}" class="mobile-nav-link"><i class="fas fa-box"></i> Orders</a>
+            <a href="{% url 'dashboard_wishlist' %}" class="mobile-nav-link"><i class="fas fa-heart"></i> Wishlist</a>
+            <div class="mobile-nav-divider"></div>
+            <a href="{% url 'logout' %}" class="mobile-nav-link" style="color: var(--danger);"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        {% else %}
+            <div class="mobile-nav-divider"></div>
+            <a href="{% url 'login' %}" class="mobile-nav-link"><i class="fas fa-arrow-right-to-bracket"></i> Sign In</a>
+            <a href="{% url 'register' %}" class="mobile-nav-link"><i class="fas fa-user-plus"></i> Create Account</a>
+        {% endif %}
+        <div class="mobile-nav-divider"></div>
+        <a href="{% url 'contact' %}" class="mobile-nav-link"><i class="fas fa-envelope"></i> Contact</a>
+    </div>
+
+    <!-- Toast Notifications -->
+    {% if toast_messages %}
+    <div class="toast-container" id="toastContainer">
+        {% for msg in toast_messages %}
+        <div class="toast {{ msg.tags }}" data-auto-dismiss="5000">
+            <span>{{ msg.message }}</span>
+            <button class="toast-close" onclick="this.parentElement.remove()" aria-label="Dismiss"><i class="fas fa-xmark"></i></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Newsletter CTA - full width dark strip above footer -->
+    <section class="newsletter-section">
+        <div class="main-content">
+            <div class="newsletter-inner">
+                <div class="newsletter-text">
+                    <h2>Stay in the Loop</h2>
+                    <p>Get exclusive deals, new arrivals, and insider tips delivered to your inbox.</p>
+                </div>
+                <form class="newsletter-form" method="post" action="{% url 'subscribe' %}">
+                    {% csrf_token %}
+                    <input type="email" name="email" placeholder="Enter your email address" required aria-label="Email address">
+                    <button type="submit" class="btn btn-accent">Subscribe <i class="fas fa-arrow-right"></i></button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="main-content">
+            <!-- Trust Badges -->
+            <div class="footer-trust">
+                <div class="trust-item">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>Secure Payment</span>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-truck-fast"></i>
+                    <span>Free Shipping 5K+</span>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-rotate-left"></i>
+                    <span>30-Day Returns</span>
+                </div>
+            </div>
+
+            <!-- Main Footer Grid -->
+            <div class="footer-main">
+                <!-- Brand Column -->
+                <div class="footer-brand">
+                    <a href="{% url 'home' %}" class="footer-brand-logo">
+                        <img src="{% static 'images/logo.png' %}?v=1" alt="Islington Marketplace" class="brand-logo" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+                        <span>Islington Marketplace</span>
+                    </a>
+                    <p>Your trusted destination for premium products. Quality sellers, unmatched experience.</p>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-location-dot"></i>
+                        <span>Kathmandu, Nepal</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:+977-1-4567890">+977-1-4567890</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:support@islingtonmarketplace.com">support@islingtonmarketplace.com</a>
+                    </div>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <!-- Shop -->
+                <div class="footer-col">
+                    <h4>Shop</h4>
+                    <ul>
+                        <li><a href="{% url 'products' %}">All Products</a></li>
+                        <li><a href="{% url 'search' %}?sort=newest">New Arrivals</a></li>
+                        <li><a href="{% url 'search' %}?sort=popular">Best Sellers</a></li>
+                        <li><a href="{% url 'search' %}?sort=rating">Top Rated</a></li>
+                        <li><a href="{% url 'search' %}?sort=price_low">Deals & Offers</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div class="footer-col">
+                    <h4>Categories</h4>
+                    <ul>
+                        <li><a href="{% url 'products' %}?category=electronics">Electronics</a></li>
+                        <li><a href="{% url 'products' %}?category=clothes">Clothes</a></li>
+                        <li><a href="{% url 'products' %}?category=home-garden">Home & Garden</a></li>
+                        <li><a href="{% url 'products' %}?category=sports">Sports</a></li>
+                        <li><a href="{% url 'products' %}?category=books">Books</a></li>
+                        <li><a href="{% url 'products' %}?category=beauty">Beauty</a></li>
+                    </ul>
+                </div>
+
+                <!-- Account -->
+                <div class="footer-col">
+                    <h4>Account</h4>
+                    <ul>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'dashboard_orders' %}">My Orders</a></li>
+                        <li><a href="{% url 'dashboard_wishlist' %}">Wishlist</a></li>
+                        <li><a href="{% url 'dashboard_profile' %}">Profile</a></li>
+                        {% else %}
+                        <li><a href="{% url 'login' %}">Sign In</a></li>
+                        <li><a href="{% url 'register' %}">Create Account</a></li>
+                        <li><a href="{% url 'dashboard_orders' %}">Track Order</a></li>
+                        {% endif %}
+                        <li><a href="{% url 'become_seller' %}">Become a Seller</a></li>
+                    </ul>
+                </div>
+
+                <!-- Help & Legal -->
+                <div class="footer-col">
+                    <h4>Help & Legal</h4>
+                    <ul>
+                        <li><a href="{% url 'contact' %}">Contact Us</a></li>
+                        <li><a href="{% url 'blog' %}">Blog</a></li>
+                        {% for page in nav_pages %}
+                        <li><a href="{% url 'page_detail' page.slug %}">{{ page.title }}</a></li>
+                        {% endfor %}
+                        <li class="footer-divider"><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+                        <li><a href="{% url 'terms_of_service' %}">Terms of Service</a></li>
+                        <li><a href="{% url 'seller_guidelines' %}">Seller Guidelines</a></li>
+                        <li><a href="{% url 'prohibited_items' %}">Prohibited Items</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="footer-bottom">
+                <div class="footer-bottom-left">
+                    <span>&copy; 2026 Islington Marketplace. All rights reserved.</span>
+                    <a href="{% url 'privacy_policy' %}">Privacy</a>
+                    <a href="{% url 'terms_of_service' %}">Terms</a>
+                    <a href="#">Cookies</a>
+                </div>
+                <div class="footer-bottom-right">
+                    <div class="payment-icons">
+                        <span class="payment-icon">VISA</span>
+                        <span class="payment-icon">PayPal</span>
+                        <span class="payment-icon">Stripe</span>
+                        <span class="payment-icon">Apple Pay</span>
+                        <span class="payment-icon">eSewa</span>
+                        <span class="payment-icon">Khalti</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <div class="mobile-bottom-nav-items">
+            <a href="{% url 'home' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <i class="fas fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="{% url 'products' %}" class="mobile-bottom-nav-item {% if request.resolver_match.url_name == 'products' %}active{% endif %}">
+                <i class="fas fa-store"></i>
+                <span>Products</span>
+            </a>
+            <a href="{% url 'cart_detail' %}" class="mobile-bottom-nav-item" id="mobileCartBtn">
+                <i class="fas fa-bag-shopping"></i>
+                {% if cart_item_count %}<span class="action-badge">{{ cart_item_count }}</span>{% endif %}
+                <span>Cart</span>
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'dashboard_wishlist' %}" class="mobile-bottom-nav-item">
+                <i class="fas fa-heart"></i>
+                {% if wishlist_count %}<span class="action-badge">{{ wishlist_count }}</span>{% endif %}
+                <span>Wishlist</span>
+            </a>
+            <a href="{% url 'dashboard' %}" class="mobile-bottom-nav-item">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}" class="mobile-bottom-nav-item">
+                <i class="fas fa-user"></i>
+                <span>Sign In</span>
+            </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+    (function() {
+        // Mobile Navigation
+        var navToggle = document.getElementById('navToggle');
+        var mobileNav = document.getElementById('mobileNav');
+        var mobileNavOverlay = document.getElementById('mobileNavOverlay');
+
+        function openMobileNav() {
+            mobileNav.classList.add('active');
+            mobileNavOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            navToggle.innerHTML = '<i class="fas fa-xmark"></i>';
+        }
+
+        function closeMobileNav() {
+            mobileNav.classList.remove('active');
+            mobileNavOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            navToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+
+        if (navToggle) {
+            navToggle.addEventListener('click', function() {
+                mobileNav.classList.contains('active') ? closeMobileNav() : openMobileNav();
+            });
+        }
+
+        if (mobileNavOverlay) {
+            mobileNavOverlay.addEventListener('click', closeMobileNav);
+        }
+
+        // User Dropdown
+        var userDropdown = document.getElementById('userDropdown');
+        if (userDropdown) {
+            var toggleBtn = userDropdown.querySelector('.user-dropdown-btn');
+            var dropdownMenu = userDropdown.querySelector('.user-dropdown');
+
+            toggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var isOpen = dropdownMenu.classList.contains('active');
+                dropdownMenu.classList.toggle('active');
+                this.setAttribute('aria-expanded', !isOpen);
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.user-menu')) {
+                    dropdownMenu.classList.remove('active');
+                    toggleBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        // Dark Mode Toggle
+        var themeToggle = document.getElementById('themeToggle');
+        var html = document.documentElement;
+        var savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+
+        themeToggle.addEventListener('click', function() {
+            var current = html.getAttribute('data-theme');
+            var next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        });
+
+        function updateThemeIcon(theme) {
+            var icon = themeToggle.querySelector('i');
+            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Back to Top
+        var backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', function() {
+            backToTop.classList.toggle('visible', window.scrollY > 400);
+        }, { passive: true });
+        backToTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Toast Auto-dismiss
+        document.querySelectorAll('.toast[data-auto-dismiss]').forEach(function(toast) {
+            setTimeout(function() {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(120%)';
+                setTimeout(function() { toast.remove(); }, 300);
+            }, parseInt(toast.dataset.autoDismiss));
+        });
+
+        // Search Suggestions
+        var searchInput = document.getElementById('searchInput');
+        var searchSuggestions = document.getElementById('searchSuggestions');
+        var searchTimeout;
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                var query = this.value.trim();
+                if (query.length < 2) {
+                    searchSuggestions.classList.remove('active');
+                    return;
+                }
+                searchTimeout = setTimeout(function() {
+                    fetch('/api/search-suggestions/?q=' + encodeURIComponent(query))
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (data.suggestions.length > 0) {
+                                var html = '';
+                                data.suggestions.forEach(function(s) {
+                                    if (s.type === 'category') {
+                                        html += '<a href="' + s.url + '" class="search-suggestion-item">' +
+                                            '<div class="search-suggestion-info"><span class="search-suggestion-name"><i class="fas fa-folder" style="margin-right: 6px; color: var(--primary);"></i> ' + s.name + '</span></div></a>';
+                                    } else {
+                                        html += '<a href="' + s.url + '" class="search-suggestion-item">' +
+                                            (s.image ? '<img src="' + s.image + '" alt="' + s.name + '">' : '<div style="width:40px;height:40px;border-radius:8px;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;"><i class="fas fa-box" style="color:var(--ink-faint);"></i></div>') +
+                                            '<div class="search-suggestion-info"><span class="search-suggestion-name">' + s.name + '</span><span class="search-suggestion-price">Rs. ' + s.price.toLocaleString() + '</span></div></a>';
+                                    }
+                                });
+                                searchSuggestions.innerHTML = html;
+                                searchSuggestions.classList.add('active');
+                            } else {
+                                searchSuggestions.innerHTML = '<div class="search-no-results">No results found</div>';
+                                searchSuggestions.classList.add('active');
+                            }
+                        });
+                }, 300);
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.nav-search')) {
+                    searchSuggestions.classList.remove('active');
+                }
+            });
+        }
+
+        // Header scroll effect
+        var header = document.querySelector('.header');
+        if (header) {
+            window.addEventListener('scroll', function() {
+                header.classList.toggle('scrolled', window.scrollY > 20);
+            }, { passive: true });
+        }
+
+        // Scroll animations (IntersectionObserver)
+        if ('IntersectionObserver' in window) {
+            var scrollElements = document.querySelectorAll('[data-scroll], [data-scroll-stagger]');
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+            scrollElements.forEach(function(el) { observer.observe(el); });
+        }
+    })();
+
+    (function() {
+        var slides = document.querySelectorAll('.hero-slide');
+        var dots = document.querySelectorAll('.hero-dot');
+        var prevBtn = document.querySelector('.hero-arrow-prev');
+        var nextBtn = document.querySelector('.hero-arrow-next');
+        if (slides.length < 2) return;
+        var current = 0;
+        var interval = 5000;
+        var timer;
+        var paused = false;
+
+        function goToSlide(index) {
+            slides[current].classList.remove('active');
+            dots[current].classList.remove('active');
+            current = index;
+            slides[current].classList.add('active');
+            dots[current].classList.add('active');
+        }
+
+        function nextSlide() { goToSlide((current + 1) % slides.length); }
+        function prevSlide() { goToSlide((current - 1 + slides.length) % slides.length); }
+
+        function startTimer() { clearInterval(timer); timer = setInterval(nextSlide, interval); }
+        function stopTimer() { clearInterval(timer); }
+
+        dots.forEach(function(dot) {
+            dot.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var idx = parseInt(this.dataset.slide);
+                goToSlide(idx);
+                paused = false;
+                startTimer();
+            });
+        });
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                prevSlide();
+                paused = true;
+                stopTimer();
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                nextSlide();
+                paused = true;
+                stopTimer();
+            });
+        }
+
+        var carousel = document.querySelector('.hero-carousel');
+        if (carousel) {
+            carousel.addEventListener('click', function(e) {
+                if (e.target.closest('.hero-dot') || e.target.closest('.hero-arrow') || e.target.closest('.hero-actions') || e.target.closest('a') || e.target.closest('.hero-float-product')) return;
+                nextSlide();
+            });
+            carousel.addEventListener('mouseenter', function() { if (!paused) stopTimer(); });
+            carousel.addEventListener('mouseleave', function() { if (!paused) startTimer(); });
+        }
+
+        startTimer();
+    })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
