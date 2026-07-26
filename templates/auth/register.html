@@ -81,7 +81,7 @@
             <div style="margin-bottom: var(--sp-5);">
                 <label style="display: flex; align-items: flex-start; gap: var(--sp-2); font-size: var(--text-sm); color: var(--ink-muted); cursor: pointer;">
                     <input type="checkbox" required style="accent-color: var(--primary); margin-top: 3px;">
-                    <span>I agree to the <a href="#" style="color: var(--primary); font-weight: 500;">Terms of Service</a> and <a href="#" style="color: var(--primary); font-weight: 500;">Privacy Policy</a></span>
+                    <span>I agree to the <a href="{% url 'terms_of_service' %}" style="color: var(--accent); font-weight: 500; text-decoration: underline;">Terms of Service</a> and <a href="{% url 'privacy_policy' %}" style="color: var(--accent); font-weight: 500; text-decoration: underline;">Privacy Policy</a></span>
                 </label>
             </div>
             <button type="submit" class="btn btn-primary btn-block btn-lg" id="registerBtn">
