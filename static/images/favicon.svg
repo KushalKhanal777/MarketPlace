@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="8" fill="#18181B"/>
+  <path d="M8 12 L16 8 L24 12 L24 20 L16 24 L8 20 Z" fill="none" stroke="#C8A951" stroke-width="1.5" stroke-linejoin="round"/>
+  <text x="16" y="18.5" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" font-weight="700" fill="#C8A951" letter-spacing="-0.5">IM</text>
+</svg>

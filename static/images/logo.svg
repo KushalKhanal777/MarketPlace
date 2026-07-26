@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <rect width="40" height="40" rx="10" fill="#18181B"/>
+  <path d="M10 14 L20 10 L30 14 L30 26 L20 30 L10 26 Z" fill="none" stroke="#C8A951" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M15 16 L20 14 L25 16 L25 24 L20 26 L15 24 Z" fill="rgba(200,169,81,0.1)" stroke="#C8A951" stroke-width="1" stroke-linejoin="round"/>
+  <text x="20" y="22.5" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#C8A951" letter-spacing="-0.5">IM</text>
+</svg>
