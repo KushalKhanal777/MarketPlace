@@ -1,0 +1,118 @@
+{% extends 'master/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Islington Marketplace{% endblock %}
+
+{% block content %}
+<div class="dashboard-bg fade-in">
+    <div class="dashboard-bg-orb dashboard-bg-orb-1"></div>
+    <div class="dashboard-bg-orb dashboard-bg-orb-2"></div>
+    <div class="dashboard-bg-orb dashboard-bg-orb-3"></div>
+    <div class="dashboard-bg-content">
+        <div class="dashboard-bg-left">
+            <h1>Welcome back, {{ user.first_name|default:user.username }}!</h1>
+            <p>Here's what's happening with your account today.</p>
+        </div>
+        <div class="dashboard-bg-right">
+            <img src="{% static 'images/logo.png' %}?v=1" alt="" class="dashboard-bg-logo">
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-layout fade-in">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">{{ user.first_name.0|default:user.username.0|upper }}</div>
+            <div>
+                <div class="sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="sidebar-user-email">{{ user.email }}</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i class="fas fa-gauge-high"></i> Overview</a>
+            <a href="{% url 'dashboard_profile' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_profile' %}active{% endif %}"><i class="fas fa-user"></i> Profile</a>
+            <a href="{% url 'dashboard_orders' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_orders' %}active{% endif %}"><i class="fas fa-box"></i> Orders</a>
+            <a href="{% url 'dashboard_earnings' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_earnings' %}active{% endif %}"><i class="fas fa-wallet"></i> Earnings</a>
+            <a href="{% url 'dashboard_payment_settings' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_payment_settings' %}active{% endif %}"><i class="fas fa-credit-card"></i> Payment Settings</a>
+            <a href="{% url 'dashboard_wishlist' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_wishlist' %}active{% endif %}"><i class="fas fa-heart"></i> Wishlist</a>
+            <a href="{% url 'dashboard_reviews' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_reviews' %}active{% endif %}"><i class="fas fa-star"></i> Reviews</a>
+            <a href="{% url 'dashboard_settings' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_settings' %}active{% endif %}"><i class="fas fa-gear"></i> Settings</a>
+            <div class="sidebar-nav-divider"></div>
+            <a href="{% url 'logout' %}" class="sidebar-nav-item danger"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <!-- Stats -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon blue"><i class="fas fa-box"></i></div>
+                </div>
+                <div class="stat-number">{{ total_orders|default:"0" }}</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon amber"><i class="fas fa-clock"></i></div>
+                </div>
+                <div class="stat-number">{{ active_orders|default:"0" }}</div>
+                <div class="stat-label">Active Orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon rose"><i class="fas fa-heart"></i></div>
+                </div>
+                <div class="stat-number">{{ wishlist_count|default:"0" }}</div>
+                <div class="stat-label">Wishlist Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon green"><i class="fas fa-star"></i></div>
+                </div>
+                <div class="stat-number">{{ review_count|default:"0" }}</div>
+                <div class="stat-label">Reviews</div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h3>Recent Orders</h3>
+                <a href="{% url 'dashboard_orders' %}" class="btn btn-sm btn-outline">View All</a>
+            </div>
+            {% if recent_orders %}
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td><strong>#{{ order.order_number }}</strong></td>
+                        <td>{{ order.created_at|date:"M d, Y" }}</td>
+                        <td><span class="order-status {{ order.status }}">{{ order.get_status_display }}</span></td>
+                        <td><strong>Rs. {{ order.total_amount }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state" style="padding: var(--sp-8);">
+                <div class="empty-icon"><i class="fas fa-box" style="font-size: 1.5rem;"></i></div>
+                <h3>No orders yet</h3>
+                <p>Start shopping to see your orders here</p>
+                <a href="{% url 'products' %}" class="btn btn-primary"><i class="fas fa-shopping-bag"></i> Browse Products</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
