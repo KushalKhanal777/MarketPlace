@@ -1,0 +1,95 @@
+{% extends 'master/base.html' %}
+
+{% block title %}Contact Us - Islington Marketplace{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="page-header-content">
+        <span class="section-badge">Contact</span>
+        <h1>Get in Touch</h1>
+        <p>We'd love to hear from you. Reach out anytime.</p>
+    </div>
+</section>
+
+<div class="about-page fade-in">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="auth-alert {% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% else %}info{% endif %}" style="margin-bottom: var(--sp-6);">
+        <i class="fas {% if 'success' in message.tags %}fa-circle-check{% elif 'error' in message.tags %}fa-circle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <section class="about-hero">
+        <h1>We're Here to Help</h1>
+        <p>Have a question, suggestion, or just want to say hello? Our team is ready to assist you with anything you need.</p>
+    </section>
+
+    <section class="about-section">
+        <h2><i class="fas fa-address-card" style="color: var(--accent); margin-right: var(--sp-2);"></i> Contact Information</h2>
+        <div class="about-values">
+            <div class="about-value-card">
+                <i class="fas fa-phone"></i>
+                <h3>Phone</h3>
+                <p><a href="tel:+977-9842422254" style="color: var(--ink-soft); text-decoration: none;">9842422254</a></p>
+            </div>
+            <div class="about-value-card">
+                <i class="fas fa-envelope"></i>
+                <h3>Email</h3>
+                <p><a href="mailto:support@islingtonmarketplace.com" style="color: var(--ink-soft); text-decoration: none;">support@islingtonmarketplace.com</a></p>
+            </div>
+            <div class="about-value-card">
+                <i class="fas fa-location-dot"></i>
+                <h3>Address</h3>
+                <p>Kathmandu, Nepal</p>
+            </div>
+            <div class="about-value-card">
+                <i class="fas fa-clock"></i>
+                <h3>Business Hours</h3>
+                <p>24/7 — We never close</p>
+            </div>
+            <div class="about-value-card">
+                <i class="fas fa-headset"></i>
+                <h3>Customer Support</h3>
+                <p>Available around the clock for all your queries</p>
+            </div>
+            <div class="about-value-card">
+                <i class="fas fa-comments"></i>
+                <h3>Live Chat</h3>
+                <p>Chat with our support team in real time on our website</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section">
+        <h2><i class="fas fa-paper-plane" style="color: var(--accent); margin-right: var(--sp-2);"></i> Send Us a Message</h2>
+        <div class="contact-form-card">
+            <form method="POST" class="auth-form">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Your Name *</label>
+                        <input type="text" name="name" class="form-input" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        <input type="email" name="email" class="form-input" placeholder="your@email.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subject</label>
+                    <input type="text" name="subject" class="form-input" placeholder="What is this about?">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message *</label>
+                    <textarea name="message" class="form-textarea" rows="5" placeholder="Write your message here..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Send Message
+                </button>
+            </form>
+        </div>
+    </section>
+</div>
+{% endblock %}
