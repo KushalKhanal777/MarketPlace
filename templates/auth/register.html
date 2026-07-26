@@ -1,0 +1,183 @@
+{% extends 'master/base.html' %}
+{% load static %}
+
+{% block title %}Create Account - Islington Marketplace{% endblock %}
+
+{% block content %}
+<div class="auth-page fade-in">
+    <div class="auth-card">
+        <div class="auth-header">
+            <img src="{% static 'images/logo.png' %}?v=1" alt="Islington Marketplace" class="auth-brand-icon" style="width:52px;height:52px;border-radius:50%;object-fit:cover;">
+            <h1>Create account</h1>
+            <p>Join thousands of happy shoppers</p>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="auth-alert {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}" id="authAlert">
+            <i class="fas {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+            <span>{{ message }}</span>
+            <button type="button" class="auth-alert-close" onclick="this.parentElement.remove()"><i class="fas fa-xmark"></i></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="auth-form" id="registerForm">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="id_first_name">First Name</label>
+                    <input type="text" name="first_name" id="id_first_name" class="form-input" placeholder="First name" value="{{ form_data.first_name|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="id_last_name">Last Name</label>
+                    <input type="text" name="last_name" id="id_last_name" class="form-input" placeholder="Last name" value="{{ form_data.last_name|default:'' }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_username">Username *</label>
+                <div class="input-icon-wrapper">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" name="username" id="id_username" class="form-input form-input-icon" placeholder="Choose a username" required value="{{ form_data.username|default:'' }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_email">Email *</label>
+                <div class="input-icon-wrapper">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" name="email" id="id_email" class="form-input form-input-icon" placeholder="your@email.com" required value="{{ form_data.email|default:'' }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_password1">Password *</label>
+                <div class="input-icon-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" name="password1" id="id_password1" class="form-input form-input-icon" placeholder="Create a password" required oninput="checkPasswordStrength(this.value)">
+                    <button type="button" class="password-toggle" onclick="togglePassword('id_password1', this)" aria-label="Show password">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="password-strength" id="passwordStrength">
+                    <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                </div>
+                <div class="password-requirements" id="passwordRequirements">
+                    <div class="password-req" id="req-length"><i class="fas fa-circle"></i> At least 8 characters</div>
+                    <div class="password-req" id="req-upper"><i class="fas fa-circle"></i> One uppercase letter</div>
+                    <div class="password-req" id="req-lower"><i class="fas fa-circle"></i> One lowercase letter</div>
+                    <div class="password-req" id="req-number"><i class="fas fa-circle"></i> One number</div>
+                    <div class="password-req" id="req-special"><i class="fas fa-circle"></i> One special character</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_password2">Confirm Password *</label>
+                <div class="input-icon-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" name="password2" id="id_password2" class="form-input form-input-icon" placeholder="Confirm your password" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('id_password2', this)" aria-label="Show password">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div style="margin-bottom: var(--sp-5);">
+                <label style="display: flex; align-items: flex-start; gap: var(--sp-2); font-size: var(--text-sm); color: var(--ink-muted); cursor: pointer;">
+                    <input type="checkbox" required style="accent-color: var(--primary); margin-top: 3px;">
+                    <span>I agree to the <a href="#" style="color: var(--primary); font-weight: 500;">Terms of Service</a> and <a href="#" style="color: var(--primary); font-weight: 500;">Privacy Policy</a></span>
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="registerBtn">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+
+        <div class="auth-divider">or continue with</div>
+
+        <div class="auth-social">
+            <a href="#" class="btn btn-social btn-google" onclick="showToast('Google signup coming soon!', 'info'); return false;">
+                <i class="fab fa-google"></i> Google
+            </a>
+            <a href="#" class="btn btn-social btn-facebook" onclick="showToast('Facebook signup coming soon!', 'info'); return false;">
+                <i class="fab fa-facebook-f"></i> Facebook
+            </a>
+        </div>
+
+        <div class="auth-footer">
+            Already have an account? <a href="{% url 'login' %}">Sign in</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(inputId, btn) {
+    var input = document.getElementById(inputId);
+    var icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+function checkPasswordStrength(password) {
+    var strength = 0;
+    var requirements = {
+        length: password.length >= 8,
+        upper: /[A-Z]/.test(password),
+        lower: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+
+    Object.keys(requirements).forEach(function(key) {
+        var el = document.getElementById('req-' + key);
+        if (el) {
+            if (requirements[key]) {
+                el.classList.add('met');
+                strength++;
+            } else {
+                el.classList.remove('met');
+            }
+        }
+    });
+
+    var bar = document.getElementById('passwordStrengthBar');
+    if (bar) {
+        var percent = (strength / 5) * 100;
+        bar.style.width = percent + '%';
+        if (strength <= 2) {
+            bar.className = 'password-strength-bar weak';
+        } else if (strength <= 3) {
+            bar.className = 'password-strength-bar fair';
+        } else if (strength <= 4) {
+            bar.className = 'password-strength-bar good';
+        } else {
+            bar.className = 'password-strength-bar strong';
+        }
+    }
+}
+
+function showToast(message, type) {
+    var existing = document.querySelector('.toast-container');
+    if (!existing) {
+        existing = document.createElement('div');
+        existing.className = 'toast-container';
+        document.body.appendChild(existing);
+    }
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + (type || '');
+    toast.innerHTML = '<span>' + message + '</span><button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-xmark"></i></button>';
+    existing.appendChild(toast);
+    setTimeout(function() { toast.classList.add('show'); }, 10);
+    setTimeout(function() { toast.classList.remove('show'); setTimeout(function() { toast.remove(); }, 300); }, 3000);
+}
+
+// Auto-dismiss alert
+var alert = document.getElementById('authAlert');
+if (alert) {
+    setTimeout(function() { alert.style.opacity = '0'; setTimeout(function() { alert.remove(); }, 300); }, 5000);
+}
+</script>
+{% endblock %}
