@@ -1,0 +1,69 @@
+{% extends 'master/base.html' %}
+{% load static %}
+
+{% block title %}eSewa Payment — Islington Marketplace{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <h1><i class="fas fa-wallet"></i> eSewa Payment</h1>
+        <p>Complete your payment with eSewa</p>
+    </div>
+</div>
+
+<div class="payment-page">
+    <div class="payment-card">
+        <div class="payment-header">
+            <img src="https://esewa.com.np/common/images/esewa_logo.png" alt="eSewa" class="payment-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="payment-logo-fallback" style="display:none;"><i class="fas fa-wallet"></i> eSewa</div>
+            <p>Order #{{ order.order_number }}</p>
+        </div>
+
+        <div class="payment-amount">
+            <span>Total Amount</span>
+            <strong>Rs. {{ order.total_amount|floatformat:2 }}</strong>
+        </div>
+
+        <div class="payment-details">
+            <div class="payment-detail-row">
+                <span>Order Number</span>
+                <span>{{ order.order_number }}</span>
+            </div>
+            <div class="payment-detail-row">
+                <span>Payment Method</span>
+                <span>eSewa Wallet</span>
+            </div>
+            <div class="payment-detail-row">
+                <span>Status</span>
+                <span class="status-pending">Pending Payment</span>
+            </div>
+        </div>
+
+        <!-- eSewa Sandbox Form -->
+        <form action="https://uat.esewa.com.np/epay/main" method="POST" class="esewa-form" id="esewaForm">
+            <input type="hidden" name="amt" value="{{ esewa_config.amt }}">
+            <input type="hidden" name="pdc" value="{{ esewa_config.pdc }}">
+            <input type="hidden" name="psc" value="{{ esewa_config.psc }}">
+            <input type="hidden" name="txAmt" value="{{ esewa_config.txAmt }}">
+            <input type="hidden" name="tAmt" value="{{ esewa_config.tAmt }}">
+            <input type="hidden" name="pid" value="{{ esewa_config.pid }}">
+            <input type="hidden" name="scd" value="{{ esewa_config.scd }}">
+            <input type="hidden" name="su" value="{{ esewa_config.su }}">
+            <input type="hidden" name="fu" value="{{ esewa_config.fu }}">
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg esewa-pay-btn">
+                <i class="fas fa-wallet"></i> Pay Rs. {{ order.total_amount|floatformat:2 }} with eSewa
+            </button>
+        </form>
+
+        <div class="payment-info">
+            <p><i class="fas fa-info-circle"></i> You will be redirected to eSewa's secure payment page.</p>
+            <p><i class="fas fa-shield-halved"></i> Your payment information is encrypted and secure.</p>
+        </div>
+
+        <div class="payment-actions">
+            <a href="{% url 'checkout' %}" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Checkout</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
