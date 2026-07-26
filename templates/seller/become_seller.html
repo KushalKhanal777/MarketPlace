@@ -1,0 +1,218 @@
+{% extends 'master/base.html' %}
+{% load static %}
+
+{% block title %}Become a Seller - Islington Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+.seller-hero {
+    background: linear-gradient(135deg, #09090B 0%, #18181B 100%);
+    padding: var(--sp-10) var(--sp-8);
+    text-align: center;
+    border-radius: var(--r-2xl);
+    margin-bottom: var(--sp-8);
+    position: relative;
+    overflow: hidden;
+}
+.seller-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(200,169,81,0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+.seller-hero-content { position: relative; z-index: 1; }
+.seller-hero h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--sp-3);
+}
+.seller-hero p { color: rgba(255,255,255,0.4); font-size: var(--text-sm); max-width: 500px; margin: 0 auto; }
+.seller-hero .hero-icon {
+    width: 64px; height: 64px; border-radius: var(--r-xl);
+    background: rgba(200,169,81,0.12); color: var(--accent);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; margin-bottom: var(--sp-4);
+}
+
+.seller-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-xl); padding: var(--sp-8); margin-bottom: var(--sp-6);
+}
+.seller-card h2 {
+    font-family: var(--font-display); font-size: var(--text-base);
+    font-weight: 600; color: var(--ink); margin-bottom: var(--sp-2);
+    display: flex; align-items: center; gap: var(--sp-2);
+}
+.seller-card h2 i { color: var(--accent); font-size: var(--text-sm); }
+.seller-card .subtitle { font-size: var(--text-sm); color: var(--ink-muted); margin-bottom: var(--sp-6); }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+@media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+
+.legal-checkbox {
+    display: flex; align-items: flex-start; gap: var(--sp-3);
+    padding: var(--sp-4); border: 1.5px solid var(--border);
+    border-radius: var(--r-md); margin-bottom: var(--sp-3);
+    transition: all var(--dur-fast);
+}
+.legal-checkbox:hover { border-color: var(--ink-faint); }
+.legal-checkbox:has(input:checked) {
+    border-color: var(--accent); background: var(--accent-bg);
+}
+.legal-checkbox input[type="checkbox"] {
+    accent-color: var(--accent); width: 18px; height: 18px;
+    margin-top: 2px; flex-shrink: 0;
+}
+.legal-checkbox-text { font-size: var(--text-sm); color: var(--ink-muted); line-height: 1.5; }
+.legal-checkbox-text a { color: var(--accent); font-weight: 500; text-decoration: underline; }
+
+.existing-app-status {
+    background: var(--warning-bg); border: 1px solid var(--warning);
+    border-radius: var(--r-lg); padding: var(--sp-5);
+    display: flex; align-items: center; gap: var(--sp-3);
+    margin-bottom: var(--sp-6);
+}
+.existing-app-status i { font-size: 1.2rem; color: var(--warning); }
+.existing-app-status p { font-size: var(--text-sm); color: var(--ink-soft); }
+
+.benefits-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4);
+    margin-bottom: var(--sp-8);
+}
+@media (max-width: 768px) { .benefits-grid { grid-template-columns: 1fr; } }
+.benefit-item {
+    text-align: center; padding: var(--sp-5);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+}
+.benefit-item i { font-size: 1.5rem; color: var(--accent); margin-bottom: var(--sp-2); display: block; }
+.benefit-item h4 { font-size: var(--text-sm); font-weight: 600; color: var(--ink); margin-bottom: var(--sp-1); }
+.benefit-item p { font-size: 11px; color: var(--ink-muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content" style="padding-top: var(--sp-8); padding-bottom: var(--sp-12); max-width: 700px; margin: 0 auto;">
+
+    <div class="seller-hero fade-in">
+        <div class="seller-hero-content">
+            <div class="hero-icon"><i class="fas fa-store"></i></div>
+            <h1>Become a Seller</h1>
+            <p>Join Islington Marketplace and reach thousands of customers across Nepal. Fill in your details below to get started.</p>
+        </div>
+    </div>
+
+    <div class="benefits-grid fade-in">
+        <div class="benefit-item">
+            <i class="fas fa-bolt"></i>
+            <h4>Quick Setup</h4>
+            <p>Start selling in minutes, not days</p>
+        </div>
+        <div class="benefit-item">
+            <i class="fas fa-users"></i>
+            <h4>Large Audience</h4>
+            <p>Reach thousands of active buyers</p>
+        </div>
+        <div class="benefit-item">
+            <i class="fas fa-shield-halved"></i>
+            <h4>Secure Payments</h4>
+            <p>Get paid safely via eSewa or Khalti</p>
+        </div>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="auth-alert {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}" style="margin-bottom: var(--sp-6);">
+        <i class="fas {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+        <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if existing_app %}
+    <div class="existing-app-status fade-in">
+        <i class="fas fa-circle-info"></i>
+        <div>
+            <p><strong>Existing Application:</strong> Your application is currently <strong>{{ existing_app.get_status_display }}</strong>.</p>
+            {% if existing_app.status == 'rejected' %}
+            <p style="margin-top: var(--sp-2);"><a href="{% url 'seller_application_status' %}" style="color: var(--primary); font-weight: 500;">View details and reapply</a></p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="POST" id="sellerForm">
+        {% csrf_token %}
+
+        <div class="seller-card fade-in">
+            <h2><i class="fas fa-user"></i> Personal Information</h2>
+            <p class="subtitle">Tell us about yourself. This information helps us verify your identity as a seller.</p>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="id_full_name">Full Name *</label>
+                    <input type="text" name="full_name" id="id_full_name" class="form-input" placeholder="Enter your full name" value="{{ existing_app.full_name|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="id_phone">Phone Number *</label>
+                    <input type="tel" name="phone" id="id_phone" class="form-input" placeholder="98XXXXXXXX" value="{{ existing_app.phone|default:'' }}" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_email">Email Address *</label>
+                <input type="email" name="email" id="id_email" class="form-input" placeholder="your@email.com" value="{{ existing_app.email|default:user.email }}" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_address">Street Address *</label>
+                <input type="text" name="address" id="id_address" class="form-input" placeholder="Ward, Street, Area" value="{{ existing_app.address|default:'' }}" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="id_city">City *</label>
+                    <input type="text" name="city" id="id_city" class="form-input" placeholder="e.g. Kathmandu" value="{{ existing_app.city|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="id_province">Province *</label>
+                    <select name="province" id="id_province" class="form-select" required>
+                        <option value="">Select province</option>
+                        <option value="Koshi" {% if existing_app.province == 'Koshi' %}selected{% endif %}>Koshi</option>
+                        <option value="Madhesh" {% if existing_app.province == 'Madhesh' %}selected{% endif %}>Madhesh</option>
+                        <option value="Bagmati" {% if existing_app.province == 'Bagmati' %}selected{% endif %}>Bagmati</option>
+                        <option value="Gandaki" {% if existing_app.province == 'Gandaki' %}selected{% endif %}>Gandaki</option>
+                        <option value="Lumbini" {% if existing_app.province == 'Lumbini' %}selected{% endif %}>Lumbini</option>
+                        <option value="Karnali" {% if existing_app.province == 'Karnali' %}selected{% endif %}>Karnali</option>
+                        <option value="Sudurpashchim" {% if existing_app.province == 'Sudurpashchim' %}selected{% endif %}>Sudurpashchim</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="seller-card fade-in">
+            <h2><i class="fas fa-scale-balanced"></i> Terms & Agreements</h2>
+            <p class="subtitle">Please review and agree to the following to complete your application.</p>
+
+            <label class="legal-checkbox">
+                <input type="checkbox" name="agreed_to_terms" value="1" required>
+                <div class="legal-checkbox-text">
+                    I have read and agree to the <a href="{% url 'terms_of_service' %}" target="_blank" rel="noopener">Terms of Service</a>, <a href="{% url 'privacy_policy' %}" target="_blank" rel="noopener">Privacy Policy</a>, and <a href="{% url 'seller_guidelines' %}" target="_blank" rel="noopener">Seller Guidelines</a>.
+                </div>
+            </label>
+        </div>
+
+        <div style="text-align: center; margin-top: var(--sp-6);">
+            <button type="submit" class="btn btn-primary btn-lg" style="min-width: 280px;">
+                <i class="fas fa-paper-plane"></i> Submit Application
+            </button>
+            <p style="font-size: 11px; color: var(--ink-faint); margin-top: var(--sp-3);">Your application will be reviewed within 24 hours</p>
+        </div>
+
+    </form>
+</div>
+{% endblock %}
