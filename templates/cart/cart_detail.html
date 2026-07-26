@@ -1,0 +1,277 @@
+{% extends 'master/base.html' %}
+
+{% block title %}Shopping Cart - Islington Marketplace{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb-nav">
+    <ol>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li>Shopping Cart</li>
+    </ol>
+</nav>
+
+<div class="cart-page fade-in">
+    <!-- Cart Items Column -->
+    <div class="cart-items-section">
+        <h1 class="dashboard-title" style="margin-bottom: var(--sp-6);">
+            <i class="fas fa-shopping-bag"></i> Shopping Cart
+            <span style="font-size: 0.9rem; font-weight: 400; color: var(--ink-muted); margin-left: var(--sp-2);">
+                ({{ cart.total_items }} item{{ cart.total_items|pluralize }})
+            </span>
+        </h1>
+
+        {% if items %}
+        <div class="cart-items">
+            {% for item in items %}
+            <div class="cart-item" data-item-id="{{ item.id }}">
+                <!-- Product Image -->
+                <div class="cart-item-image">
+                    {% if item.product.product_image %}
+                        <img src="{{ item.product.product_image.url }}" alt="{{ item.product.product_name }}" loading="lazy">
+                    {% else %}
+                        <div class="product-placeholder" style="height: 100%; width: 100%; border-radius: var(--r-md);">
+                            <i class="fas fa-image" style="font-size: 1.5rem; opacity: 0.3;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Product Info -->
+                <div class="cart-item-info">
+                    <div class="cart-item-details">
+                        <a href="{% url 'product_detail' item.product.id %}" class="cart-item-name">{{ item.product.product_name }}</a>
+                        <span class="cart-item-category">{{ item.product.category }}</span>
+                        {% if item.product.stock <= 5 and item.product.stock > 0 %}
+                            <span class="stock-badge low-stock" style="font-size: 0.65rem;">Only {{ item.product.stock }} left</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="cart-item-bottom">
+                        <!-- Price -->
+                        <div class="cart-item-price">
+                            {% if item.product.discount_price %}
+                                <span class="discounted-price" style="font-size: 1rem;">Rs. {{ item.product.discount_price }}</span>
+                                <span class="original-price" style="font-size: 0.75rem;">Rs. {{ item.product.price }}</span>
+                            {% else %}
+                                <span class="current-price" style="font-size: 1rem;">Rs. {{ item.product.price }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Quantity Controls -->
+                        <div class="cart-item-qty">
+                            <form method="POST" action="{% url 'update_cart' item.id %}" class="quantity-control" data-ajax="true">
+                                {% csrf_token %}
+                                <button type="button" class="quantity-btn" onclick="changeCartQty(this, -1)">-</button>
+                                <input type="number" name="quantity" class="quantity-input" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" onchange="this.closest('form').submit()">
+                                <button type="button" class="quantity-btn" onclick="changeCartQty(this, 1)">+</button>
+                            </form>
+                        </div>
+
+                        <!-- Subtotal -->
+                        <div class="cart-item-subtotal">
+                            <span class="cart-item-subtotal-label">Subtotal</span>
+                            <span class="cart-item-subtotal-value">Rs. {{ item.subtotal }}</span>
+                        </div>
+
+                        <!-- Remove -->
+                        <form method="POST" action="{% url 'remove_from_cart' item.id %}" data-ajax="true" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="cart-remove-btn" title="Remove item">
+                                <i class="fas fa-trash-alt"></i> Remove
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Continue Shopping -->
+        <div class="cart-continue">
+            <a href="{% url 'products' %}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Continue Shopping
+            </a>
+        </div>
+
+        {% else %}
+        <!-- Empty Cart -->
+        <div class="empty-state" style="padding: var(--sp-16) var(--sp-8);">
+            <div class="empty-icon">
+                <i class="fas fa-shopping-cart" style="font-size: 2.5rem;"></i>
+            </div>
+            <h3>Your Cart is Empty</h3>
+            <p>Looks like you haven't added anything to your cart yet.</p>
+            <a href="{% url 'products' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-shopping-bag"></i> Start Shopping
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Order Summary Column -->
+    {% if items %}
+    <aside class="cart-summary">
+        <h3 class="cart-summary-title">Order Summary</h3>
+
+        <!-- Coupon Section -->
+        <div class="cart-coupon-section">
+            {% if cart.coupon and coupon_valid %}
+            <div class="cart-coupon-applied">
+                <div class="coupon-info">
+                    <i class="fas fa-tag"></i>
+                    <div>
+                        <strong>{{ cart.coupon.code }}</strong>
+                        <span>{% if cart.coupon.discount_percent %}{{ cart.coupon.discount_percent }}% off{% else %}Rs. {{ cart.coupon.discount_amount }} off{% endif %}</span>
+                    </div>
+                </div>
+                <form method="POST" action="{% url 'remove_coupon' %}" data-ajax="true" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="coupon-remove-btn" title="Remove coupon"><i class="fas fa-times"></i></button>
+                </form>
+            </div>
+            {% else %}
+            <form method="POST" action="{% url 'apply_coupon' %}" data-ajax="true" class="coupon-form">
+                {% csrf_token %}
+                <input type="text" name="coupon_code" placeholder="Enter coupon code" class="coupon-input" required>
+                <button type="submit" class="btn btn-sm btn-outline">Apply</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Summary Rows -->
+        <div class="cart-summary-lines">
+            <div class="cart-summary-row">
+                <span>Subtotal ({{ cart.total_items }} items)</span>
+                <span id="summary-subtotal">Rs. {{ subtotal }}</span>
+            </div>
+
+            {% if cart.savings > 0 %}
+            <div class="cart-summary-row" style="color: var(--olive);">
+                <span>Product Savings</span>
+                <span>- Rs. {{ cart.savings }}</span>
+            </div>
+            {% endif %}
+
+            {% if coupon_discount > 0 %}
+            <div class="cart-summary-row" style="color: var(--olive);" id="coupon-discount-row">
+                <span>Coupon Discount</span>
+                <span id="summary-coupon">- Rs. {{ coupon_discount }}</span>
+            </div>
+            {% endif %}
+
+            <div class="cart-summary-row">
+                <span>Shipping</span>
+                <span style="color: var(--olive);">Free</span>
+            </div>
+        </div>
+
+        <!-- Total -->
+        <div class="cart-summary-total">
+            <span>Total</span>
+            <span id="summary-total">Rs. {{ total }}</span>
+        </div>
+
+        {% if savings > 0 %}
+        <div class="cart-savings-badge">
+            <i class="fas fa-piggy-bank"></i>
+            You're saving Rs. {{ savings }} on this order!
+        </div>
+        {% endif %}
+
+        <!-- Checkout Button -->
+        <a href="{% url 'checkout' %}" class="btn btn-primary btn-block btn-lg" style="margin-top: var(--sp-5);">
+            <i class="fas fa-lock"></i> Proceed to Checkout
+        </a>
+
+        <!-- Trust Signals -->
+        <div class="cart-trust-signals">
+            <div class="trust-signal">
+                <i class="fas fa-shield-halved"></i>
+                <span>Secure Checkout</span>
+            </div>
+            <div class="trust-signal">
+                <i class="fas fa-truck-fast"></i>
+                <span>Free Shipping</span>
+            </div>
+            <div class="trust-signal">
+                <i class="fas fa-undo"></i>
+                <span>Easy Returns</span>
+            </div>
+        </div>
+    </aside>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// CSRF token for AJAX
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Quantity controls on cart page
+function changeCartQty(btn, delta) {
+    const input = btn.parentElement.querySelector('.quantity-input');
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    if (val > parseInt(input.max)) val = parseInt(input.max);
+    input.value = val;
+    // Auto-submit the form
+    input.closest('form').submit();
+}
+
+// AJAX form handling for cart operations
+document.querySelectorAll('[data-ajax]').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                // Update cart badge
+                const badge = document.querySelector('#cartBtn .action-badge');
+                if (data.cart_total > 0) {
+                    if (badge) {
+                        badge.textContent = data.cart_total;
+                    } else {
+                        const newBadge = document.createElement('span');
+                        newBadge.className = 'action-badge';
+                        newBadge.textContent = data.cart_total;
+                        document.getElementById('cartBtn').appendChild(newBadge);
+                    }
+                } else if (badge) {
+                    badge.remove();
+                }
+
+                // Reload page to reflect changes
+                location.reload();
+            }
+        })
+        .catch(err => {
+            // Fallback: submit normally
+            form.submit();
+        });
+    });
+});
+</script>
+{% endblock %}
