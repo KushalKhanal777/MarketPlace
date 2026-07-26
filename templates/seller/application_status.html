@@ -1,0 +1,233 @@
+{% extends 'master/base.html' %}
+{% load static %}
+
+{% block title %}Application Status - Islington Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+.status-hero {
+    background: linear-gradient(135deg, #09090B 0%, #18181B 100%);
+    padding: var(--sp-10) var(--sp-8);
+    text-align: center;
+    border-radius: var(--r-2xl);
+    margin-bottom: var(--sp-8);
+    position: relative;
+    overflow: hidden;
+}
+.status-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(200,169,81,0.06) 0%, transparent 70%);
+    pointer-events: none;
+}
+.status-hero-content { position: relative; z-index: 1; }
+.status-hero h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--sp-2);
+}
+.status-hero p { color: rgba(255,255,255,0.4); font-size: var(--text-sm); }
+
+.status-badge {
+    display: inline-flex; align-items: center; gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-4); border-radius: var(--r-full);
+    font-size: var(--text-sm); font-weight: 600;
+}
+.status-badge.pending { background: var(--amber-bg); color: var(--amber); }
+.status-badge.under_review { background: var(--blue-bg); color: var(--blue); }
+.status-badge.approved { background: var(--success-bg); color: var(--success); }
+.status-badge.rejected { background: var(--danger-bg); color: var(--danger); }
+.status-badge.needs_info { background: rgba(249,115,22,0.08); color: #F97316; }
+
+.status-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-xl); padding: var(--sp-8); margin-bottom: var(--sp-6);
+}
+.status-card h2 {
+    font-family: var(--font-display); font-size: var(--text-base);
+    font-weight: 600; color: var(--ink); margin-bottom: var(--sp-5);
+    display: flex; align-items: center; gap: var(--sp-2);
+}
+.status-card h2 i { color: var(--accent); font-size: var(--text-sm); }
+
+.timeline {
+    position: relative; padding-left: var(--sp-8);
+}
+.timeline::before {
+    content: ''; position: absolute; left: 11px; top: 8px; bottom: 8px;
+    width: 2px; background: var(--border);
+}
+.timeline-item {
+    position: relative; padding-bottom: var(--sp-6);
+}
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-dot {
+    position: absolute; left: -25px; top: 4px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+}
+.timeline-dot.active { border-color: var(--accent); background: var(--accent-bg); }
+.timeline-dot.completed { border-color: var(--success); background: var(--success-bg); }
+.timeline-dot i { font-size: 10px; color: var(--ink-faint); }
+.timeline-dot.active i, .timeline-dot.completed i { color: var(--accent); }
+.timeline-title { font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
+.timeline-date { font-size: var(--text-xs); color: var(--ink-faint); margin-top: var(--sp-1); }
+
+.detail-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4);
+}
+.detail-item { padding: var(--sp-3) 0; border-bottom: 1px solid var(--border-light); }
+.detail-item .label { font-size: var(--text-xs); color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--sp-1); }
+.detail-item .value { font-size: var(--text-sm); color: var(--ink); font-weight: 500; }
+
+.no-application {
+    text-align: center; padding: var(--sp-16) var(--sp-4);
+}
+.no-application i { font-size: 3rem; color: var(--ink-faint); margin-bottom: var(--sp-4); display: block; }
+.no-application h3 { font-size: var(--text-lg); color: var(--ink); margin-bottom: var(--sp-2); }
+.no-application p { font-size: var(--text-sm); color: var(--ink-muted); margin-bottom: var(--sp-6); }
+
+@media (max-width: 640px) { .detail-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content" style="padding-top: var(--sp-8); padding-bottom: var(--sp-12); max-width: 800px; margin: 0 auto;">
+
+    <div class="status-hero fade-in">
+        <div class="status-hero-content">
+            <h1>Seller Application Status</h1>
+            <p>Track the progress of your seller application</p>
+        </div>
+    </div>
+
+    {% if application %}
+    <div class="status-card fade-in">
+        <h2><i class="fas fa-circle-info"></i> Current Status</h2>
+        <div style="text-align: center; padding: var(--sp-4) 0;">
+            <span class="status-badge {{ application.status }}">
+                <i class="fas {% if application.status == 'approved' %}fa-circle-check{% elif application.status == 'rejected' %}fa-circle-xmark{% elif application.status == 'under_review' %}fa-clock{% elif application.status == 'needs_info' %}fa-triangle-exclamation{% else %}fa-hourglass-half{% endif %}"></i>
+                {{ application.get_status_display }}
+            </span>
+            {% if application.review_notes %}
+            <p style="font-size: var(--text-sm); color: var(--ink-muted); margin-top: var(--sp-4); max-width: 500px; margin-left: auto; margin-right: auto;">
+                <strong>Reviewer notes:</strong> {{ application.review_notes }}
+            </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="status-card fade-in">
+        <h2><i class="fas fa-timeline"></i> Application Timeline</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot completed"><i class="fas fa-check"></i></div>
+                <div class="timeline-title">Application Submitted</div>
+                <div class="timeline-date">{{ application.created_at|date:"F d, Y" }} at {{ application.created_at|time:"g:i A" }}</div>
+            </div>
+            {% if application.status == 'under_review' or application.status == 'approved' or application.status == 'rejected' %}
+            <div class="timeline-item">
+                <div class="timeline-dot active"><i class="fas fa-magnifying-glass"></i></div>
+                <div class="timeline-title">Under Review</div>
+                <div class="timeline-date">Our team is reviewing your application</div>
+            </div>
+            {% endif %}
+            {% if application.status == 'approved' %}
+            <div class="timeline-item">
+                <div class="timeline-dot completed"><i class="fas fa-check"></i></div>
+                <div class="timeline-title">Application Approved</div>
+                <div class="timeline-date">You can now start listing products</div>
+            </div>
+            {% elif application.status == 'rejected' %}
+            <div class="timeline-item">
+                <div class="timeline-dot"><i class="fas fa-xmark"></i></div>
+                <div class="timeline-title">Application Rejected</div>
+                <div class="timeline-date">Please review the feedback and reapply</div>
+            </div>
+            {% elif application.status == 'needs_info' %}
+            <div class="timeline-item">
+                <div class="timeline-dot"><i class="fas fa-exclamation"></i></div>
+                <div class="timeline-title">More Information Required</div>
+                <div class="timeline-date">Please update your application with the requested details</div>
+            </div>
+            {% else %}
+            <div class="timeline-item">
+                <div class="timeline-dot"><i class="fas fa-circle"></i></div>
+                <div class="timeline-title">Pending Review</div>
+                <div class="timeline-date">Estimated 2-3 business days</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="status-card fade-in">
+        <h2><i class="fas fa-file-lines"></i> Submitted Details</h2>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="label">Full Name</div>
+                <div class="value">{{ application.full_name }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="label">Email</div>
+                <div class="value">{{ application.email }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="label">Phone</div>
+                <div class="value">{{ application.phone }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="label">City</div>
+                <div class="value">{{ application.city }}, {{ application.province }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="label">Business Type</div>
+                <div class="value">{{ application.get_business_type_display }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="label">Business Name</div>
+                <div class="value">{{ application.business_name|default:"N/A" }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="label">Document Type</div>
+                <div class="value">{{ application.get_document_type_display }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="label">Applied On</div>
+                <div class="value">{{ application.created_at|date:"F d, Y" }}</div>
+            </div>
+        </div>
+        {% if application.product_categories.all %}
+        <div style="margin-top: var(--sp-5);">
+            <div style="font-size: var(--text-xs); color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--sp-2);">Product Categories</div>
+            <div style="display: flex; flex-wrap: wrap; gap: var(--sp-2);">
+                {% for cat in application.product_categories.all %}
+                <span class="status-badge" style="background: var(--bg-alt); color: var(--ink-soft);"><i class="fas fa-tag" style="font-size: 10px;"></i> {{ cat.name }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if application.status == 'rejected' or application.status == 'needs_info' %}
+    <div style="text-align: center;" class="fade-in">
+        <a href="{% url 'become_seller' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-pen"></i> Update Application
+        </a>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="status-card fade-in no-application">
+        <i class="fas fa-file-circle-question"></i>
+        <h3>No Application Found</h3>
+        <p>You haven't submitted a seller application yet.</p>
+        <a href="{% url 'become_seller' %}" class="btn btn-primary"><i class="fas fa-arrow-right"></i> Apply as a Seller</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
