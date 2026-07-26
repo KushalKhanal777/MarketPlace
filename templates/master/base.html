@@ -199,11 +199,12 @@
                     <h2>Stay in the Loop</h2>
                     <p>Get exclusive deals, new arrivals, and insider tips delivered to your inbox.</p>
                 </div>
-                <form class="newsletter-form" method="post" action="{% url 'subscribe' %}">
+                <form class="newsletter-form" id="newsletterForm" onsubmit="return handleNewsletter(event)">
                     {% csrf_token %}
-                    <input type="email" name="email" placeholder="Enter your email address" required aria-label="Email address">
-                    <button type="submit" class="btn btn-accent">Subscribe <i class="fas fa-arrow-right"></i></button>
+                    <input type="email" name="email" placeholder="Enter your email address" required aria-label="Email address" id="newsletterEmail">
+                    <button type="submit" class="btn btn-accent" id="newsletterBtn">Subscribe <i class="fas fa-arrow-right"></i></button>
                 </form>
+                <div class="newsletter-msg" id="newsletterMsg"></div>
             </div>
         </div>
     </section>
@@ -601,6 +602,46 @@
 
         startTimer();
     })();
+
+    // Newsletter AJAX
+    function handleNewsletter(e) {
+        e.preventDefault();
+        var form = document.getElementById('newsletterForm');
+        var emailInput = document.getElementById('newsletterEmail');
+        var btn = document.getElementById('newsletterBtn');
+        var msg = document.getElementById('newsletterMsg');
+        var email = emailInput.value.trim();
+        if (!email) return false;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subscribing...';
+        msg.textContent = '';
+        msg.className = 'newsletter-msg';
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: new URLSearchParams({email: email})
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            msg.textContent = data.message;
+            msg.className = 'newsletter-msg ' + (data.success ? 'success' : 'error');
+            if (data.success) emailInput.value = '';
+        })
+        .catch(function() {
+            msg.textContent = 'Something went wrong. Please try again.';
+            msg.className = 'newsletter-msg error';
+        })
+        .finally(function() {
+            btn.disabled = false;
+            btn.innerHTML = 'Subscribe <i class="fas fa-arrow-right"></i>';
+        });
+        return false;
+    }
     </script>
 
     {% block extra_js %}{% endblock %}
