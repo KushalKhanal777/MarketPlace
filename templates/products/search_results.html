@@ -1,0 +1,375 @@
+{% extends 'master/base.html' %}
+{% load static %}
+
+{% block title %}{% if query %}Search: {{ query }}{% else %}Search Products{% endif %} - Islington Marketplace{% endblock %}
+
+{% block content %}
+<!-- Ad Banner Hero -->
+<section class="ad-hero" id="adHero">
+    <div class="ad-hero-slides">
+        <div class="ad-hero-slide active" data-slide="0">
+            <div class="ad-hero-bg ad-hero-bg-1"></div>
+            <div class="ad-hero-content">
+                <div class="ad-hero-text">
+                    <span class="ad-hero-badge"><i class="fas fa-bolt"></i> Flash Sale</span>
+                    <h2 class="ad-hero-title">Up to 50% Off Electronics</h2>
+                    <p class="ad-hero-subtitle">Limited time offer on top brands. Don't miss out!</p>
+                    <a href="{% url 'products' %}?category=electronics" class="btn btn-primary btn-sm"><i class="fas fa-shopping-bag"></i> Shop Now</a>
+                </div>
+                <div class="ad-hero-visual">
+                    <div class="ad-hero-discount">
+                        <span class="ad-hero-discount-number">50</span>
+                        <span class="ad-hero-discount-symbol">%<span>OFF</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ad-hero-slide" data-slide="1">
+            <div class="ad-hero-bg ad-hero-bg-2"></div>
+            <div class="ad-hero-content">
+                <div class="ad-hero-text">
+                    <span class="ad-hero-badge"><i class="fas fa-truck-fast"></i> Free Delivery</span>
+                    <h2 class="ad-hero-title">Free Shipping Over Rs. 5,000</h2>
+                    <p class="ad-hero-subtitle">No minimum purchase required. Fast delivery across Nepal.</p>
+                    <a href="{% url 'products' %}" class="btn btn-primary btn-sm"><i class="fas fa-arrow-right"></i> Browse Products</a>
+                </div>
+                <div class="ad-hero-visual">
+                    <div class="ad-hero-icon-wrap">
+                        <i class="fas fa-truck-fast"></i>
+                        <span class="ad-hero-free-tag">FREE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ad-hero-slide" data-slide="2">
+            <div class="ad-hero-bg ad-hero-bg-3"></div>
+            <div class="ad-hero-content">
+                <div class="ad-hero-text">
+                    <span class="ad-hero-badge"><i class="fas fa-star"></i> New Arrivals</span>
+                    <h2 class="ad-hero-title">Discover What's New</h2>
+                    <p class="ad-hero-subtitle">Fresh picks added daily. Be the first to shop new trends.</p>
+                    <a href="{% url 'search' %}?sort=newest" class="btn btn-primary btn-sm"><i class="fas fa-sparkles"></i> Explore New</a>
+                </div>
+                <div class="ad-hero-visual">
+                    <div class="ad-hero-icon-wrap">
+                        <i class="fas fa-certificate"></i>
+                        <span class="ad-hero-free-tag">NEW</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ad-hero-slide" data-slide="3">
+            <div class="ad-hero-bg ad-hero-bg-4"></div>
+            <div class="ad-hero-content">
+                <div class="ad-hero-text">
+                    <span class="ad-hero-badge"><i class="fas fa-shield-halved"></i> Trust</span>
+                    <h2 class="ad-hero-title">100% Secure Checkout</h2>
+                    <p class="ad-hero-subtitle">Shop with confidence. Easy returns within 30 days.</p>
+                    <a href="{% url 'about' %}" class="btn btn-primary btn-sm"><i class="fas fa-shield-halved"></i> Why Us</a>
+                </div>
+                <div class="ad-hero-visual">
+                    <div class="ad-hero-icon-wrap">
+                        <i class="fas fa-shield-halved"></i>
+                        <span class="ad-hero-free-tag">SAFE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ad-hero-dots">
+        <button class="ad-hero-dot active" data-slide="0" aria-label="Slide 1"></button>
+        <button class="ad-hero-dot" data-slide="1" aria-label="Slide 2"></button>
+        <button class="ad-hero-dot" data-slide="2" aria-label="Slide 3"></button>
+        <button class="ad-hero-dot" data-slide="3" aria-label="Slide 4"></button>
+    </div>
+</section>
+
+<!-- Breadcrumb -->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol class="breadcrumb-list">
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></li>
+        <li><a href="{% url 'products' %}">Products</a></li>
+        <li class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></li>
+        <li class="breadcrumb-current">Search Results</li>
+    </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="page-title-row">
+    <div class="page-title-left">
+        {% if query %}
+        <h1 class="page-title">Results for &ldquo;{{ query }}&rdquo;</h1>
+        {% else %}
+        <h1 class="page-title">Search Products</h1>
+        {% endif %}
+        <span class="page-product-count">{{ products.paginator.count }} product{{ products.paginator.count|pluralize }}</span>
+    </div>
+    <div class="page-title-right">
+        <div class="page-sort">
+            <label class="page-sort-label" for="sortSelect">Sort by:</label>
+            <select class="page-sort-select" id="sortSelect" onchange="window.location.href=this.value">
+                <option value="{% url 'search' %}?q={{ query }}&sort=newest" {% if sort == 'newest' or not sort %}selected{% endif %}>Newest</option>
+                <option value="{% url 'search' %}?q={{ query }}&sort=popular" {% if sort == 'popular' %}selected{% endif %}>Most Popular</option>
+                <option value="{% url 'search' %}?q={{ query }}&sort=price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                <option value="{% url 'search' %}?q={{ query }}&sort=price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                <option value="{% url 'search' %}?q={{ query }}&sort=rating" {% if sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<section class="products-page fade-in">
+    <aside class="filter-sidebar">
+        <div class="filter-header">
+            <h3>Filters</h3>
+        </div>
+        <form method="GET" action="{% url 'search' %}" id="filterForm">
+            <input type="hidden" name="q" value="{{ query }}">
+
+            <div class="filter-group">
+                <h4>Categories</h4>
+                <ul class="category-list">
+                    <li><a href="{% url 'search' %}?q={{ query }}" class="{% if not selected_category %}active{% endif %}"><span class="category-list-icon"><i class="fas fa-store"></i></span> All Categories</a></li>
+                    {% for cat in categories %}
+                    <li><a href="{% url 'search' %}?q={{ query }}&category={{ cat.slug }}" class="{% if selected_category == cat.slug %}active{% endif %}"><span class="category-list-icon">
+                        {% if cat.icon == 'fa-spa' %}<img src="{% static 'images/cat-beauty.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-book' %}<img src="{% static 'images/cat-books.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-shirt' %}<img src="{% static 'images/cat-clothes.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-microchip' %}<img src="{% static 'images/cat-electronics.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-house' %}<img src="{% static 'images/cat-home.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-dumbbell' %}<img src="{% static 'images/cat-sports.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-box' %}<img src="{% static 'images/cat-alcohol.svg' %}" alt="">
+                        {% elif cat.icon == 'fa-utensils' %}<img src="{% static 'images/cat-food.svg' %}" alt="">
+                        {% else %}<i class="fas fa-tag"></i>
+                        {% endif %}
+                    </span> {{ cat.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="filter-group">
+                <h4>Price Range</h4>
+                <div class="price-range">
+                    <input type="number" name="min_price" class="price-input" placeholder="Min" value="{{ min_price|default:'' }}">
+                    <span style="color: var(--ink-muted);">-</span>
+                    <input type="number" name="max_price" class="price-input" placeholder="Max" value="{{ max_price|default:'' }}">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h4>Rating</h4>
+                <div class="rating-filter">
+                    {% for r in "54321" %}
+                    <label class="rating-option">
+                        <input type="radio" name="rating" value="{{ r }}" {% if rating == r %}checked{% endif %}>
+                        <span class="rating-stars">
+                            {% for i in "12345" %}{% if forloop.counter <= r %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                        </span>
+                        <span>& Up</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: var(--sp-4);">Apply Filters</button>
+            <a href="{% url 'search' %}?q={{ query }}" class="btn btn-outline btn-block" style="margin-top: var(--sp-2);">Clear Filters</a>
+        </form>
+    </aside>
+
+    <div class="products-content">
+        <div class="product-grid" data-scroll-stagger data-scroll="fade-up">
+            {% for product in products %}
+            <article class="product-card">
+                <div class="product-image">
+                    {% if product.product_image %}
+                        <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" loading="lazy">
+                    {% else %}
+                        <div class="product-placeholder"><i class="fas fa-image" style="font-size: 2rem; opacity: 0.3;"></i></div>
+                    {% endif %}
+                    {% if product.discount_price %}
+                    <span class="product-badge-discount">-{{ product.discount_percentage }}%</span>
+                    {% endif %}
+                    <span class="product-badge">{{ product.category }}</span>
+                    <div class="product-overlay">
+                        <a href="{% url 'product_detail' product.id %}" class="btn-quick-view">Quick View</a>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <div class="product-meta">
+                        <span class="product-category">{{ product.category }}</span>
+                    </div>
+                    <h3 class="product-name"><a href="{% url 'product_detail' product.id %}">{{ product.product_name }}</a></h3>
+                    <div class="product-rating">
+                        <span class="product-stars">
+                            {% for i in "12345" %}{% if forloop.counter <= product.average_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                        </span>
+                        <span class="product-review-count">({{ product.review_count }})</span>
+                    </div>
+                    <div class="product-footer">
+                        <div class="product-price">
+                            {% if product.discount_price %}
+                                <span class="discounted-price">Rs. {{ product.discount_price }}</span>
+                                <span class="original-price">Rs. {{ product.price }}</span>
+                            {% else %}
+                                <span class="current-price">Rs. {{ product.price }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="product-card-actions">
+                            <button class="btn btn-add-cart" onclick="quickAddToCart({{ product.id }})" title="Add to Cart">
+                                <i class="fas fa-shopping-bag"></i> Add to Cart
+                            </button>
+                            <button class="btn btn-buy-now" onclick="buyNow({{ product.id }})" title="Buy Now">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-magnifying-glass" style="font-size: 1.5rem;"></i></div>
+                <h3>No Products Found</h3>
+                <p>Try adjusting your search or filter criteria.</p>
+                <a href="{% url 'products' %}" class="btn btn-primary">Browse All Products</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if products.has_other_pages %}
+        <div class="pagination">
+            {% if products.has_previous %}
+            <a href="?q={{ query }}&page={{ products.previous_page_number }}&sort={{ sort }}" class="pagination-btn"><i class="fas fa-chevron-left"></i></a>
+            {% endif %}
+            {% for num in products.paginator.page_range %}
+            <a href="?q={{ query }}&page={{ num }}&sort={{ sort }}" class="pagination-btn {% if products.number == num %}active{% endif %}">{{ num }}</a>
+            {% endfor %}
+            {% if products.has_next %}
+            <a href="?q={{ query }}&page={{ products.next_page_number }}&sort={{ sort }}" class="pagination-btn"><i class="fas fa-chevron-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Ad Hero Carousel
+(function() {
+    var slides = document.querySelectorAll('.ad-hero-slide');
+    var dots = document.querySelectorAll('.ad-hero-dot');
+    if (slides.length < 2) return;
+    var current = 0;
+    var interval = 4000;
+    var timer;
+
+    function goToSlide(index) {
+        slides[current].classList.remove('active');
+        dots[current].classList.remove('active');
+        current = index;
+        slides[current].classList.add('active');
+        dots[current].classList.add('active');
+    }
+
+    function nextSlide() { goToSlide((current + 1) % slides.length); }
+
+    function startTimer() { clearInterval(timer); timer = setInterval(nextSlide, interval); }
+
+    dots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+            goToSlide(parseInt(this.dataset.slide));
+            startTimer();
+        });
+    });
+
+    var hero = document.getElementById('adHero');
+    if (hero) {
+        hero.addEventListener('mouseenter', function() { clearInterval(timer); });
+        hero.addEventListener('mouseleave', function() { startTimer(); });
+    }
+
+    startTimer();
+})();
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function updateCartBadge(cartTotal) {
+    const badge = document.querySelector('#cartBtn .action-badge');
+    if (badge) { badge.textContent = cartTotal; }
+    else {
+        const b = document.createElement('span');
+        b.className = 'action-badge';
+        b.textContent = cartTotal;
+        document.getElementById('cartBtn').appendChild(b);
+    }
+    const mobileBadge = document.querySelector('#mobileCartBtn .action-badge');
+    if (mobileBadge) { mobileBadge.textContent = cartTotal; }
+    else if (document.getElementById('mobileCartBtn')) {
+        const mb = document.createElement('span');
+        mb.className = 'action-badge';
+        mb.textContent = cartTotal;
+        document.getElementById('mobileCartBtn').appendChild(mb);
+    }
+}
+
+function quickAddToCart(productId) {
+    const formData = new FormData();
+    formData.append('quantity', 1);
+    formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+    fetch('/cart/add/' + productId + '/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            updateCartBadge(data.cart_total);
+            showToast(data.message, 'success');
+        }
+    })
+    .catch(() => {});
+}
+
+function buyNow(productId) {
+    const formData = new FormData();
+    formData.append('quantity', 1);
+    formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+    fetch('/cart/add/' + productId + '/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) { window.location.href = '/checkout/'; }
+    })
+    .catch(() => {});
+}
+
+function showToast(message, type) {
+    let c = document.querySelector('.toast-container');
+    if (!c) { c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); }
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + (type || '');
+    toast.innerHTML = '<span>' + message + '</span><button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-xmark"></i></button>';
+    c.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+}
+</script>
+{% endblock %}
