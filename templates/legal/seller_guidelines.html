@@ -1,0 +1,162 @@
+{% extends 'master/base.html' %}
+
+{% block title %}Seller Guidelines - Islington Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+.legal-page { max-width: 860px; margin: 0 auto; }
+.legal-page .page-header { margin-bottom: var(--sp-8); }
+.legal-content {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-xl); padding: var(--sp-10);
+}
+.legal-content h2 {
+    font-family: var(--font-display); font-size: var(--text-lg);
+    font-weight: 600; color: var(--ink); margin: var(--sp-8) 0 var(--sp-4);
+    display: flex; align-items: center; gap: var(--sp-3);
+}
+.legal-content h2:first-child { margin-top: 0; }
+.legal-content h2 .guide-icon {
+    width: 36px; height: 36px; border-radius: var(--r-md);
+    background: var(--accent-bg); color: var(--accent);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: var(--text-sm); flex-shrink: 0;
+}
+.legal-content h3 {
+    font-size: var(--text-base); font-weight: 600; color: var(--ink-soft);
+    margin: var(--sp-5) 0 var(--sp-3);
+}
+.legal-content p {
+    font-size: var(--text-sm); color: var(--ink-muted);
+    line-height: 1.7; margin-bottom: var(--sp-3);
+}
+.legal-content ul, .legal-content ol {
+    margin: var(--sp-3) 0; padding-left: var(--sp-6);
+}
+.legal-content li {
+    font-size: var(--text-sm); color: var(--ink-muted);
+    line-height: 1.7; margin-bottom: var(--sp-2);
+}
+.legal-content li strong { color: var(--ink-soft); }
+.legal-meta {
+    font-size: var(--text-xs); color: var(--ink-faint);
+    text-align: center; margin-top: var(--sp-4); padding-top: var(--sp-4);
+    border-top: 1px solid var(--border-light);
+}
+.tip-box {
+    background: var(--accent-bg); border: 1px solid rgba(200,169,81,0.2);
+    border-radius: var(--r-md); padding: var(--sp-4);
+    margin: var(--sp-4) 0;
+}
+.tip-box p { margin-bottom: 0; color: var(--ink-soft); font-size: var(--text-sm); }
+.tip-box i { color: var(--accent); margin-right: var(--sp-2); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content" style="padding-top: var(--sp-8); padding-bottom: var(--sp-12);">
+    <div class="legal-page fade-in">
+        <section class="page-header">
+            <div class="page-header-content">
+                <span class="section-badge">Sellers</span>
+                <h1>Seller Guidelines</h1>
+                <p>Everything you need to know to succeed on Islington Marketplace</p>
+            </div>
+        </section>
+
+        <div class="legal-content">
+            <h2><i class="guide-icon"><i class="fas fa-rocket"></i></i> Getting Started</h2>
+            <p>Welcome to Islington Marketplace! Here's what you need to know to begin selling:</p>
+            <ul>
+                <li><strong>Complete your profile:</strong> Ensure your seller profile is fully filled out with accurate business information and a professional profile image</li>
+                <li><strong>Verify your identity:</strong> Complete the KYC verification process by uploading valid government-issued identification</li>
+                <li><strong>Set up payment:</strong> Configure your preferred payout method (eSewa, Khalti, or bank transfer) in your dashboard</li>
+                <li><strong>Understand fees:</strong> Familiarize yourself with our commission structure (typically 10% per sale)</li>
+                <li><strong>Review policies:</strong> Read all seller guidelines, prohibited items list, and content policies before listing</li>
+            </ul>
+
+            <h2><i class="guide-icon"><i class="fas fa-images"></i></i> Product Listing Standards</h2>
+            <p>High-quality listings lead to more sales. Follow these standards:</p>
+            <ul>
+                <li><strong>Product images:</strong> Use clear, well-lit photos on a clean background. Include multiple angles. Minimum resolution: 800x800px</li>
+                <li><strong>No watermarks:</strong> Product images should not contain watermarks, logos, or text overlays</li>
+                <li><strong>Accurate descriptions:</strong> Provide detailed, honest descriptions including dimensions, materials, features, and any defects</li>
+                <li><strong>Correct categorization:</strong> Place products in the most appropriate category. Miscategorized products may be removed</li>
+                <li><strong>Pricing:</strong> All prices must be in Nepalese Rupees (NPR). Clearly indicate if shipping is included</li>
+                <li><strong>Stock levels:</strong> Keep inventory counts accurate. Overselling leads to order cancellations and penalties</li>
+                <li><strong>Brand authenticity:</strong> Only list genuine products. Counterfeit items will result in immediate account suspension</li>
+            </ul>
+
+            <h2><i class="guide-icon"><i class="fas fa-tags"></i></i> Pricing Policy</h2>
+            <p>Fair and transparent pricing is essential for buyer trust:</p>
+            <ul>
+                <li>Prices must be reasonable and competitive for the market</li>
+                <li>Do not artificially inflate prices to show fake "discounts"</li>
+                <li>All applicable taxes (VAT) should be included or clearly stated</li>
+                <li>Shipping costs must be disclosed before checkout</li>
+                <li>Price changes cannot be applied to already-placed orders</li>
+            </ul>
+            <div class="tip-box">
+                <p><i class="fas fa-lightbulb"></i> <strong>Pro Tip:</strong> Products with competitive pricing and free shipping tend to sell 40% faster on our platform.</p>
+            </div>
+
+            <h2><i class="guide-icon"><i class="fas fa-truck"></i></i> Shipping Requirements</h2>
+            <p>Reliable shipping is critical for customer satisfaction:</p>
+            <ul>
+                <li><strong>Processing time:</strong> Orders must be shipped within 2 business days of confirmation</li>
+                <li><strong>Packaging:</strong> Use appropriate packaging to prevent damage during transit</li>
+                <li><strong>Tracking:</strong> Provide tracking information for all shipments</li>
+                <li><strong>Free shipping:</strong> Consider offering free shipping on orders over Rs. 5,000 (our platform standard)</li>
+                <li><strong>Insurance:</strong> Recommended for high-value items (over Rs. 10,000)</li>
+                <li><strong>Local delivery:</strong> For Kathmandu Valley, aim for same-day or next-day delivery when possible</li>
+            </ul>
+
+            <h2><i class="guide-icon"><i class="fas fa-rotate-left"></i></i> Return Policy</h2>
+            <p>We maintain a buyer-friendly return policy to build trust:</p>
+            <ul>
+                <li><strong>30-day returns:</strong> Buyers may return items within 30 days of delivery for any reason</li>
+                <li><strong>Return conditions:</strong> Items must be unused, in original packaging, with tags attached</li>
+                <li><strong>Defective items:</strong> Sellers bear return shipping costs for defective or misrepresented items</li>
+                <li><strong>Refund timeline:</strong> Refunds must be processed within 5 business days of receiving the return</li>
+                <li><strong>Disputes:</strong> If you disagree with a return request, you may escalate through the platform's dispute resolution</li>
+            </ul>
+
+            <h2><i class="guide-icon"><i class="fas fa-star"></i></i> Seller Ratings</h2>
+            <p>Your seller rating directly impacts your visibility and sales:</p>
+            <ul>
+                <li><strong>Rating system:</strong> Buyers rate sellers on a 1-5 star scale based on product quality, shipping speed, and communication</li>
+                <li><strong>Performance metrics:</strong> We track order completion rate, on-time shipping rate, and customer satisfaction</li>
+                <li><strong>Top Seller badge:</strong> Maintaining a 4.5+ rating with 50+ sales unlocks the Top Seller badge</li>
+                <li><strong>Rating impact:</strong> Low ratings (below 3.5) may result in reduced visibility or account review</li>
+                <li><strong>Fake reviews:</strong> Posting fake reviews or incentivizing positive reviews is strictly prohibited</li>
+            </ul>
+
+            <h2><i class="guide-icon"><i class="fas fa-gavel"></i></i> Account Suspension</h2>
+            <p>Your account may be suspended for the following violations:</p>
+            <ul>
+                <li>Selling counterfeit, stolen, or prohibited items</li>
+                <li>Consistently failing to ship orders on time</li>
+                <li>High return rates due to product misrepresentation</li>
+                <li>Abusive behavior toward buyers or platform staff</li>
+                <li>Manipulating ratings or reviews</li>
+                <li>Multiple unresolved customer complaints</li>
+                <li>Violation of any applicable laws or regulations</li>
+            </ul>
+            <p>Suspended sellers lose access to the platform. Repeat or severe violations may result in permanent account termination and forfeiture of pending payouts.</p>
+
+            <h2><i class="guide-icon"><i class="fas fa-heart"></i></i> Community Standards</h2>
+            <p>We are building a trusted community. As a seller, we expect you to:</p>
+            <ul>
+                <li><strong>Communicate professionally:</strong> Respond to buyer inquiries within 24 hours</li>
+                <li><strong>Honor commitments:</strong> Fulfill all orders as described and within the stated timeframe</li>
+                <li><strong>Be transparent:</strong> Disclose all relevant product information, including any limitations or defects</li>
+                <li><strong>Resolve disputes fairly:</strong> Work toward amicable solutions before escalating</li>
+                <li><strong>Report issues:</strong> Use the Content Report system to flag violations by other sellers</li>
+                <li><strong>Continuous improvement:</strong> Regularly review your performance metrics and customer feedback</li>
+            </ul>
+
+            <div class="legal-meta">Last Updated: July 26, 2026</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

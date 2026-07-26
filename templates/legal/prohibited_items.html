@@ -1,0 +1,188 @@
+{% extends 'master/base.html' %}
+
+{% block title %}Prohibited & Restricted Items - Islington Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+.legal-page { max-width: 860px; margin: 0 auto; }
+.legal-page .page-header { margin-bottom: var(--sp-8); }
+.legal-content {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-xl); padding: var(--sp-10);
+}
+.legal-content h2 {
+    font-family: var(--font-display); font-size: var(--text-lg);
+    font-weight: 600; color: var(--ink); margin: var(--sp-8) 0 var(--sp-4);
+    display: flex; align-items: center; gap: var(--sp-3);
+}
+.legal-content h2:first-child { margin-top: 0; }
+.legal-content h2 .section-icon {
+    width: 36px; height: 36px; border-radius: var(--r-md);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: var(--text-sm); flex-shrink: 0;
+}
+.section-icon.danger { background: var(--danger-bg); color: var(--danger); }
+.section-icon.warning { background: var(--amber-bg); color: var(--amber); }
+.legal-content p {
+    font-size: var(--text-sm); color: var(--ink-muted);
+    line-height: 1.7; margin-bottom: var(--sp-3);
+}
+.legal-content ul {
+    margin: var(--sp-3) 0; padding-left: var(--sp-6);
+}
+.legal-content li {
+    font-size: var(--text-sm); color: var(--ink-muted);
+    line-height: 1.7; margin-bottom: var(--sp-2);
+}
+.legal-content li strong { color: var(--ink-soft); }
+.legal-meta {
+    font-size: var(--text-xs); color: var(--ink-faint);
+    text-align: center; margin-top: var(--sp-4); padding-top: var(--sp-4);
+    border-top: 1px solid var(--border-light);
+}
+.warning-box {
+    border-radius: var(--r-md); padding: var(--sp-4);
+    margin: var(--sp-5) 0;
+}
+.warning-box.danger {
+    background: var(--danger-bg); border: 1px solid rgba(220,38,38,0.15);
+}
+.warning-box.warning {
+    background: var(--amber-bg); border: 1px solid rgba(217,119,6,0.15);
+}
+.warning-box p { margin-bottom: 0; font-size: var(--text-sm); }
+.warning-box i { margin-right: var(--sp-2); }
+.warning-box.danger i { color: var(--danger); }
+.warning-box.warning i { color: var(--amber); }
+.warning-box.danger p { color: var(--danger); }
+.warning-box.warning p { color: var(--amber); }
+
+.items-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--sp-3); margin: var(--sp-4) 0;
+}
+.item-card {
+    padding: var(--sp-4); border-radius: var(--r-md);
+    border: 1px solid var(--border); transition: all var(--dur-fast);
+}
+.item-card:hover { border-color: var(--ink-faint); }
+.item-card .item-icon {
+    width: 32px; height: 32px; border-radius: var(--r-sm);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; margin-bottom: var(--sp-2);
+}
+.item-card .item-name { font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
+.item-card .item-desc { font-size: var(--text-xs); color: var(--ink-muted); margin-top: var(--sp-1); }
+.item-card.prohibited .item-icon { background: var(--danger-bg); color: var(--danger); }
+.item-card.restricted .item-icon { background: var(--amber-bg); color: var(--amber); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content" style="padding-top: var(--sp-8); padding-bottom: var(--sp-12);">
+    <div class="legal-page fade-in">
+        <section class="page-header">
+            <div class="page-header-content">
+                <span class="section-badge">Policies</span>
+                <h1>Prohibited & Restricted Items</h1>
+                <p>Items you cannot sell or need approval to sell</p>
+            </div>
+        </section>
+
+        <div class="legal-content">
+            <div class="warning-box danger">
+                <p><i class="fas fa-circle-exclamation"></i> <strong>Selling prohibited items results in immediate account suspension and potential legal action.</strong></p>
+            </div>
+
+            <h2><i class="section-icon danger"><i class="fas fa-ban"></i></i> Prohibited Items</h2>
+            <p>The following items are strictly prohibited from being listed, sold, or promoted on Islington Marketplace under any circumstances:</p>
+
+            <div class="items-grid">
+                <div class="item-card prohibited">
+                    <div class="item-icon"><i class="fas fa-crosshairs"></i></div>
+                    <div class="item-name">Weapons & Firearms</div>
+                    <div class="item-desc">Guns, ammunition, explosives, knives (over legal limit), and weapon accessories</div>
+                </div>
+                <div class="item-card prohibited">
+                    <div class="item-icon"><i class="fas fa-pills"></i></div>
+                    <div class="item-name">Drugs & narcotics</div>
+                    <div class="item-desc">Illegal substances, controlled drugs, drug paraphernalia, and unregulated supplements</div>
+                </div>
+                <div class="item-card prohibited">
+                    <div class="item-icon"><i class="fas fa-tag"></i></div>
+                    <div class="item-name">Counterfeit Goods</div>
+                    <div class="item-desc">Fake branded products, replicas, and items infringing on trademarks</div>
+                </div>
+                <div class="item-card prohibited">
+                    <div class="item-icon"><i class="fas fa-mask"></i></div>
+                    <div class="item-name">Stolen Goods</div>
+                    <div class="item-desc">Items obtained through theft, fraud, or illegal means</div>
+                </div>
+                <div class="item-card prohibited">
+                    <div class="item-icon"><i class="fas fa-paw"></i></div>
+                    <div class="item-name">Endangered Species</div>
+                    <div class="item-desc">Products from protected or endangered animals and plants (ivory, exotic skins, etc.)</div>
+                </div>
+                <div class="item-card prohibited">
+                    <div class="item-icon"><i class="fas fa-triangle-exclamation"></i></div>
+                    <div class="item-name">Recalled Items</div>
+                    <div class="item-desc">Products officially recalled by manufacturers or regulatory authorities</div>
+                </div>
+                <div class="item-card prohibited">
+                    <div class="item-icon"><i class="fas fa-18"></i></div>
+                    <div class="item-name">Adult Content</div>
+                    <div class="item-desc">Explicit sexual content, adult toys, pornography, and related materials</div>
+                </div>
+                <div class="item-card prohibited">
+                    <div class="item-icon"><i class="fas fa-dice"></i></div>
+                    <div class="item-name">Gambling Items</div>
+                    <div class="item-desc">Lottery tickets, casino chips, betting instruments, and gambling devices</div>
+                </div>
+            </div>
+
+            <div class="warning-box warning">
+                <p><i class="fas fa-triangle-exclamation"></i> <strong>Violations may also be reported to law enforcement authorities where applicable.</strong></p>
+            </div>
+
+            <h2><i class="section-icon warning"><i class="fas fa-lock"></i></i> Restricted Items</h2>
+            <p>The following items require prior approval from Islington Marketplace before they can be listed. Sellers must apply for approval and provide supporting documentation.</p>
+
+            <div class="items-grid">
+                <div class="item-card restricted">
+                    <div class="item-icon"><i class="fas fa-wine-bottle"></i></div>
+                    <div class="item-name">Alcohol</div>
+                    <div class="item-desc">Alcoholic beverages (18+). Requires valid liquor license and age verification for buyers</div>
+                </div>
+                <div class="item-card restricted">
+                    <div class="item-icon"><i class="fas fa-smoking"></i></div>
+                    <div class="item-name">Tobacco Products</div>
+                    <div class="item-desc">Cigarettes, cigars, vaping products, and related accessories (18+)</div>
+                </div>
+                <div class="item-card restricted">
+                    <div class="item-icon"><i class="fas fa-capsules"></i></div>
+                    <div class="item-name">Health Supplements</div>
+                    <div class="item-desc">Dietary supplements, vitamins, herbal products — requires certification from health authorities</div>
+                </div>
+                <div class="item-card restricted">
+                    <div class="item-icon"><i class="fas fa-microchip"></i></div>
+                    <div class="item-name">Electronics</div>
+                    <div class="item-desc">Electronics require proper certification (NTA approved). Must meet safety standards</div>
+                </div>
+            </div>
+
+            <h2><i class="section-icon danger"><i class="fas fa-gavel"></i></i> Consequences</h2>
+            <p>Violations of our Prohibited and Restricted Items policy may result in:</p>
+            <ul>
+                <li><strong>First offense:</strong> Listing removal and written warning</li>
+                <li><strong>Second offense:</strong> 30-day account suspension and review</li>
+                <li><strong>Third offense:</strong> Permanent account termination</li>
+                <li><strong>Serious violations:</strong> Immediate permanent ban and forfeiture of pending payouts</li>
+                <li><strong>Illegal items:</strong> Report to law enforcement authorities and cooperation with investigations</li>
+            </ul>
+            <p>If you are unsure whether an item is permitted, please <a href="{% url 'contact' %}" style="color: var(--primary); font-weight: 500;">contact us</a> before listing.</p>
+
+            <div class="legal-meta">Last Updated: July 26, 2026</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends 'master/base.html' %}
+
+{% block title %}Content Policy - Islington Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+.legal-page { max-width: 860px; margin: 0 auto; }
+.legal-page .page-header { margin-bottom: var(--sp-8); }
+.legal-content {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-xl); padding: var(--sp-10);
+}
+.legal-content h2 {
+    font-family: var(--font-display); font-size: var(--text-lg);
+    font-weight: 600; color: var(--ink); margin: var(--sp-8) 0 var(--sp-4);
+    display: flex; align-items: center; gap: var(--sp-3);
+}
+.legal-content h2:first-child { margin-top: 0; }
+.legal-content h2 .section-icon {
+    width: 36px; height: 36px; border-radius: var(--r-md);
+    background: var(--accent-bg); color: var(--accent);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: var(--text-sm); flex-shrink: 0;
+}
+.legal-content h3 {
+    font-size: var(--text-base); font-weight: 600; color: var(--ink-soft);
+    margin: var(--sp-5) 0 var(--sp-3);
+}
+.legal-content p {
+    font-size: var(--text-sm); color: var(--ink-muted);
+    line-height: 1.7; margin-bottom: var(--sp-3);
+}
+.legal-content ul, .legal-content ol {
+    margin: var(--sp-3) 0; padding-left: var(--sp-6);
+}
+.legal-content li {
+    font-size: var(--text-sm); color: var(--ink-muted);
+    line-height: 1.7; margin-bottom: var(--sp-2);
+}
+.legal-content li strong { color: var(--ink-soft); }
+.legal-meta {
+    font-size: var(--text-xs); color: var(--ink-faint);
+    text-align: center; margin-top: var(--sp-4); padding-top: var(--sp-4);
+    border-top: 1px solid var(--border-light);
+}
+.example-box {
+    background: var(--bg-alt); border: 1px solid var(--border-light);
+    border-radius: var(--r-md); padding: var(--sp-4);
+    margin: var(--sp-3) 0;
+}
+.example-box .do { color: var(--success); font-weight: 600; }
+.example-box .dont { color: var(--danger); font-weight: 600; }
+.example-box p { font-size: var(--text-sm); margin-bottom: var(--sp-1); }
+.example-box p:last-child { margin-bottom: 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content" style="padding-top: var(--sp-8); padding-bottom: var(--sp-12);">
+    <div class="legal-page fade-in">
+        <section class="page-header">
+            <div class="page-header-content">
+                <span class="section-badge">Policies</span>
+                <h1>Content Policy</h1>
+                <p>Guidelines for creating and managing content on Islington Marketplace</p>
+            </div>
+        </section>
+
+        <div class="legal-content">
+            <h2><i class="section-icon"><i class="fas fa-images"></i></i> Product Images</h2>
+            <p>Product images are the first impression buyers have of your items. Follow these standards:</p>
+            <ul>
+                <li><strong>Resolution:</strong> Minimum 800x800px. Recommended: 1200x1200px or higher</li>
+                <li><strong>Format:</strong> JPG or PNG. WebP accepted but JPG/PNG preferred</li>
+                <li><strong>Background:</strong> Clean, white or neutral background. Lifestyle shots encouraged as secondary images</li>
+                <li><strong>Lighting:</strong> Well-lit with accurate color representation. No heavy filters or editing</li>
+                <li><strong>Multiple views:</strong> Include front, back, side, and detail shots (minimum 3 images per listing)</li>
+                <li><strong>No watermarks:</strong> Images must not contain text overlays, logos, or watermarks</li>
+                <li><strong>Accurate representation:</strong> Images must accurately depict the actual product, including color, size, and condition</li>
+            </ul>
+            <div class="example-box">
+                <p><span class="do">Do:</span> Use natural lighting on a clean white background showing the actual product</p>
+                <p><span class="dont">Don't:</span> Use stock photos, heavily filtered images, or photos from other sellers</p>
+            </div>
+
+            <h2><i class="section-icon"><i class="fas fa-pen"></i></i> Product Descriptions</h2>
+            <p>Accurate descriptions reduce returns and build buyer trust:</p>
+            <ul>
+                <li><strong>Be specific:</strong> Include dimensions, weight, materials, color, and key features</li>
+                <li><strong>Be honest:</strong> Disclose any defects, wear, or limitations of the product</li>
+                <li><strong>Condition:</strong> Clearly state whether the item is new, like-new, used, or refurbished</li>
+                <li><strong>Compatibility:</strong> If applicable, list compatible devices, brands, or accessories</li>
+                <li><strong>What's included:</strong> Specify exactly what the buyer will receive (product, accessories, manuals, etc.)</li>
+                <li><strong>No false claims:</strong> Do not make exaggerated or unverifiable claims about product benefits</li>
+            </ul>
+            <div class="example-box">
+                <p><span class="do">Do:</span> "Cotton t-shirt, 100% organic cotton, machine washable. Available in S, M, L. Color may vary slightly from photos."</p>
+                <p><span class="dont">Don't:</span> "BEST SHIRT EVER!!! Will change your life! Guaranteed 100% perfect forever!"</p>
+            </div>
+
+            <h2><i class="section-icon"><i class="fas fa-star"></i></i> Reviews & Ratings</h2>
+            <p>Honest reviews are the foundation of our marketplace trust system:</p>
+            <ul>
+                <li><strong>Authenticity:</strong> Only genuine buyers should leave reviews for products they purchased</li>
+                <li><strong>Honest feedback:</strong> Share your real experience — both positive and constructive</li>
+                <li><strong>No fake reviews:</strong> Sellers must not create fake reviews, pay for reviews, or offer incentives for positive ratings</li>
+                <li><strong>No review manipulation:</strong> Do not ask buyers to remove or change their reviews in exchange for favors</li>
+                <li><strong>Photo reviews:</strong> Encouraged! Photo reviews help other buyers make informed decisions</li>
+                <li><strong>Respectful language:</strong> Reviews should be respectful and relevant to the product</li>
+            </ul>
+
+            <h2><i class="section-icon"><i class="fas fa-ban"></i></i> Prohibited Content</h2>
+            <p>The following types of content are not permitted anywhere on the platform:</p>
+            <ul>
+                <li><strong>Hate speech:</strong> Content that promotes discrimination, violence, or hatred against individuals or groups</li>
+                <li><strong>Harassment:</strong> Bullying, threats, or abusive behavior toward other users</li>
+                <li><strong>Misleading information:</strong> False claims, fake discounts, or deceptive pricing tactics</li>
+                <li><strong>Spam:</strong> Repetitive, unsolicited, or automated content</li>
+                <li><strong>Personal information:</strong> Sharing others' personal data without consent</li>
+                <li><strong>Illegal content:</strong> Any content that violates Nepalese law or international regulations</li>
+                <li><strong>Malicious links:</strong> Phishing attempts, malware, or deceptive URLs</li>
+            </ul>
+
+            <h2><i class="section-icon"><i class="fas fa-flag"></i></i> Reporting Violations</h2>
+            <p>Help us maintain a safe marketplace by reporting content that violates these guidelines:</p>
+            <ul>
+                <li><strong>How to report:</strong> Click the "Report" button on any product listing, review, or seller profile</li>
+                <li><strong>Provide details:</strong> Explain why the content violates our policies. Include evidence when possible</li>
+                <li><strong>Categories:</strong> Select the most relevant reason — fraud, counterfeit, inappropriate content, age-restricted, prohibited item, misleading description, harassment, or spam</li>
+                <li><strong>Confidentiality:</strong> Reporter identity is kept confidential from the reported party</li>
+                <li><strong>No retaliation:</strong> Filing good-faith reports will never result in account penalties</li>
+            </ul>
+
+            <h2><i class="section-icon"><i class="fas fa-gavel"></i></i> Enforcement</h2>
+            <p>We take content violations seriously. Our enforcement actions include:</p>
+            <ul>
+                <li><strong>Content removal:</strong> Violating content will be removed promptly upon detection or report</li>
+                <li><strong>Content editing:</strong> Minor violations may result in content being edited to comply with guidelines</li>
+                <li><strong>Listing suppression:</strong> Non-compliant listings may be hidden from search results</li>
+                <li><strong>Account warnings:</strong> First-time or minor violations receive a written warning</li>
+                <li><strong>Temporary suspension:</strong> Repeated violations result in 7-30 day account suspension</li>
+                <li><strong>Permanent ban:</strong> Severe or repeated violations lead to permanent account termination</li>
+                <li><strong>Payout hold:</strong> Accounts under review may have pending payouts held until resolution</li>
+            </ul>
+            <p>Our moderation team reviews all reports within 48 hours. Sellers may appeal enforcement decisions through the support team.</p>
+
+            <div class="legal-meta">Last Updated: July 26, 2026</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
