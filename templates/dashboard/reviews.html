@@ -1,0 +1,66 @@
+{% extends 'master/base.html' %}
+
+{% block title %}My Reviews - Islington Marketplace{% endblock %}
+
+{% block content %}
+<div class="dashboard-bg fade-in">
+    <div class="dashboard-bg-content">
+        <h1>My Reviews</h1>
+        <p>Reviews you've written for products</p>
+    </div>
+</div>
+
+<div class="dashboard-layout fade-in">
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">{{ user.first_name.0|default:user.username.0|upper }}</div>
+            <div>
+                <div class="sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="sidebar-user-email">{{ user.email }}</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="sidebar-nav-item"><i class="fas fa-gauge-high"></i> Overview</a>
+            <a href="{% url 'dashboard_profile' %}" class="sidebar-nav-item"><i class="fas fa-user"></i> Profile</a>
+            <a href="{% url 'dashboard_orders' %}" class="sidebar-nav-item"><i class="fas fa-box"></i> Orders</a>
+            <a href="{% url 'dashboard_earnings' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_earnings' %}active{% endif %}"><i class="fas fa-wallet"></i> Earnings</a>
+            <a href="{% url 'dashboard_payment_settings' %}" class="sidebar-nav-item {% if request.resolver_match.url_name == 'dashboard_payment_settings' %}active{% endif %}"><i class="fas fa-credit-card"></i> Payment Settings</a>
+            <a href="{% url 'dashboard_wishlist' %}" class="sidebar-nav-item"><i class="fas fa-heart"></i> Wishlist</a>
+            <a href="{% url 'dashboard_reviews' %}" class="sidebar-nav-item active"><i class="fas fa-star"></i> Reviews</a>
+            <a href="{% url 'dashboard_settings' %}" class="sidebar-nav-item"><i class="fas fa-gear"></i> Settings</a>
+            <div class="sidebar-nav-divider"></div>
+            <a href="{% url 'logout' %}" class="sidebar-nav-item danger"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <div class="dashboard-content">
+        {% if reviews %}
+        {% for review in reviews %}
+        <div class="review-card" style="margin-bottom: var(--sp-4);">
+            <div class="review-header">
+                <div class="review-user">
+                    <div class="review-avatar">{{ user.first_name.0|default:user.username.0|upper }}</div>
+                    <div>
+                        <div class="review-user-name">{{ review.product.product_name }}</div>
+                        <div class="review-user-date">{{ review.created_at|date:"M d, Y" }}</div>
+                    </div>
+                </div>
+                <div class="review-stars">
+                    {% for i in "12345" %}{% if forloop.counter <= review.rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                </div>
+            </div>
+            {% if review.title %}<div class="review-title">{{ review.title }}</div>{% endif %}
+            <div class="review-text">{{ review.comment }}</div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state" style="padding: var(--sp-8);">
+            <div class="empty-icon"><i class="fas fa-star" style="font-size: 1.5rem;"></i></div>
+            <h3>No reviews yet</h3>
+            <p>Reviews you write will appear here</p>
+            <a href="{% url 'products' %}" class="btn btn-primary"><i class="fas fa-shopping-bag"></i> Browse Products</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
