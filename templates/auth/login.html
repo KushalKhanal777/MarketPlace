@@ -1,0 +1,109 @@
+{% extends 'master/base.html' %}
+{% load static %}
+
+{% block title %}Sign In - Islington Marketplace{% endblock %}
+
+{% block content %}
+<div class="auth-page fade-in">
+    <div class="auth-card">
+        <div class="auth-header">
+            <img src="{% static 'images/logo.png' %}?v=1" alt="Islington Marketplace" class="auth-brand-icon" style="width:52px;height:52px;border-radius:50%;object-fit:cover;">
+            <h1>Welcome back</h1>
+            <p>Sign in to your account to continue</p>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="auth-alert {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}" id="authAlert">
+            <i class="fas {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+            <span>{{ message }}</span>
+            <button type="button" class="auth-alert-close" onclick="this.parentElement.remove()"><i class="fas fa-xmark"></i></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="auth-form" id="loginForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="id_username">Username or Email</label>
+                <div class="input-icon-wrapper">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" name="username" id="id_username" class="form-input form-input-icon" placeholder="Enter your username" required autofocus value="{{ form_data.username|default:'' }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="id_password">Password</label>
+                <div class="input-icon-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" name="password" id="id_password" class="form-input form-input-icon" placeholder="Enter your password" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('id_password', this)" aria-label="Show password">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-5);">
+                <label style="display: flex; align-items: center; gap: var(--sp-2); font-size: var(--text-sm); color: var(--ink-muted); cursor: pointer; padding: 4px 0;">
+                    <input type="checkbox" name="remember_me" style="accent-color: var(--primary); width: 16px; height: 16px;">
+                    Remember me
+                </label>
+                <a href="{% url 'password_reset' %}" style="font-size: var(--text-sm); color: var(--accent); font-weight: 500;">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg" id="loginBtn">
+                <i class="fas fa-arrow-right-to-bracket"></i> Sign In
+            </button>
+        </form>
+
+        <div class="auth-divider">or continue with</div>
+
+        <div class="auth-social">
+            <a href="#" class="btn btn-social btn-google" onclick="showToast('Google login coming soon!', 'info'); return false;">
+                <i class="fab fa-google"></i> Google
+            </a>
+            <a href="#" class="btn btn-social btn-facebook" onclick="showToast('Facebook login coming soon!', 'info'); return false;">
+                <i class="fab fa-facebook-f"></i> Facebook
+            </a>
+        </div>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="{% url 'register' %}">Create one</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(inputId, btn) {
+    var input = document.getElementById(inputId);
+    var icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+function showToast(message, type) {
+    var existing = document.querySelector('.toast-container');
+    if (!existing) {
+        existing = document.createElement('div');
+        existing.className = 'toast-container';
+        document.body.appendChild(existing);
+    }
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + (type || '');
+    toast.innerHTML = '<span>' + message + '</span><button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-xmark"></i></button>';
+    existing.appendChild(toast);
+    setTimeout(function() { toast.classList.add('show'); }, 10);
+    setTimeout(function() { toast.classList.remove('show'); setTimeout(function() { toast.remove(); }, 300); }, 3000);
+}
+
+// Auto-dismiss alert after 5 seconds
+var alert = document.getElementById('authAlert');
+if (alert) {
+    setTimeout(function() { alert.style.opacity = '0'; setTimeout(function() { alert.remove(); }, 300); }, 5000);
+}
+</script>
+{% endblock %}
