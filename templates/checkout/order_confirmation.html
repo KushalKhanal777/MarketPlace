@@ -1,0 +1,86 @@
+{% extends 'master/base.html' %}
+{% load static %}
+
+{% block title %}Order Confirmed — Islington Marketplace{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <h1><i class="fas fa-circle-check" style="color: var(--success);"></i> Order Confirmed!</h1>
+        <p>Thank you for your purchase</p>
+    </div>
+</div>
+
+<div class="confirmation-page">
+    <div class="confirmation-card">
+        <div class="confirmation-header">
+            <div class="order-number">
+                <span class="label">Order Number</span>
+                <span class="value">{{ order.order_number }}</span>
+            </div>
+            <span class="order-status badge-{{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+
+        <div class="confirmation-details">
+            <div class="detail-block">
+                <h3><i class="fas fa-user"></i> Contact</h3>
+                <p>{{ order.full_name|default:order.user.get_full_name }}<br>{{ order.email }}<br>{{ order.phone }}</p>
+            </div>
+            <div class="detail-block">
+                <h3><i class="fas fa-location-dot"></i> Delivery Address</h3>
+                <p>{{ order.shipping_address }}</p>
+            </div>
+            <div class="detail-block">
+                <h3><i class="fas fa-credit-card"></i> Payment</h3>
+                <p>
+                    {{ order.get_payment_method_display }}<br>
+                    Status: <span class="{% if order.payment_status == 'completed' %}status-completed{% elif order.payment_status == 'failed' %}status-failed{% else %}status-pending{% endif %}">{{ order.get_payment_status_display }}</span>
+                    {% if order.transaction_id %}<br>Txn ID: {{ order.transaction_id }}{% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="confirmation-items">
+            <h3>Items Ordered</h3>
+            {% for item in order.items.all %}
+            <div class="confirmation-item">
+                <div class="item-image">
+                    {% if item.product.product_image %}
+                        <img src="{{ item.product.product_image.url }}" alt="{{ item.product.product_name }}">
+                    {% else %}
+                        <div class="item-placeholder"><i class="fas fa-image"></i></div>
+                    {% endif %}
+                </div>
+                <div class="item-info">
+                    <span class="item-name">{{ item.product.product_name }}</span>
+                    <span class="item-qty">Qty: {{ item.quantity }} × Rs. {{ item.price }}</span>
+                </div>
+                <span class="item-subtotal">Rs. {{ item.subtotal|floatformat:0 }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="confirmation-total">
+            <span>Total {% if order.payment_status == 'completed' %}Paid{% else %}to Pay{% endif %}</span>
+            <span class="total-amount">Rs. {{ order.total_amount|floatformat:0 }}</span>
+        </div>
+
+        {% if order.payment_method == 'cod' %}
+        <div class="cod-notice">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Please keep exact change ready at delivery. Our rider will collect Rs. {{ order.total_amount|floatformat:0 }}.</span>
+        </div>
+        {% endif %}
+
+        <div class="confirmation-actions">
+            <a href="{% url 'home' %}" class="btn btn-primary"><i class="fas fa-shopping-bag"></i> Continue Shopping</a>
+            <a href="{% url 'dashboard_orders' %}" class="btn btn-outline"><i class="fas fa-box"></i> View Orders</a>
+        </div>
+    </div>
+</div>
+
+<style>
+.cod-notice { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-4); background: var(--amber-bg, #fffbeb); color: #92400e; border-radius: var(--r-md); margin-bottom: var(--sp-5); font-size: var(--text-sm); border: 1px solid rgba(245,158,11,0.2); }
+.cod-notice i { font-size: 18px; flex-shrink: 0; }
+</style>
+{% endblock %}
