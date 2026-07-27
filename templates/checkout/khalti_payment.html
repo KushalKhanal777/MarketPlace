@@ -38,31 +38,26 @@
             </div>
         </div>
 
-        <!-- Khalti Payment Form -->
-        <form action="{% url 'khalti_verify' order_id=order.id %}" method="POST" class="khalti-form" id="khaltiForm">
-            {% csrf_token %}
-            <input type="hidden" name="token" id="khaltiToken" value="">
-            <input type="hidden" name="amount" value="{{ khalti_config.amount }}">
-            <input type="hidden" name="khaltiPhone" id="khaltiPhoneHidden" value="">
-            <input type="hidden" name="khaltiPin" id="khaltiPinHidden" value="">
-
-            <div class="form-group">
-                <label for="khaltiPhone">Khalti Phone Number *</label>
-                <input type="tel" id="khaltiPhone" placeholder="98XXXXXXXX" pattern="[0-9]{10}" required maxlength="10">
-            </div>
-
-            <div class="form-group">
-                <label for="khaltiPin">Khalti PIN *</label>
-                <input type="password" id="khaltiPin" placeholder="Enter your 4-digit PIN" maxlength="4" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block btn-lg khalti-pay-btn" id="khaltiPayBtn">
-                <i class="fas fa-mobile-screen-button"></i> Pay Rs. {{ order.total_amount|floatformat:2 }} with Khalti
-            </button>
-        </form>
+        {% if khalti_redirect_url %}
+        <div class="khalti-redirect-notice" style="text-align:center; padding: var(--sp-4); margin: var(--sp-4) 0; background: var(--bg-alt); border-radius: var(--r-md);">
+            <p><i class="fas fa-spinner fa-spin"></i> Redirecting to Khalti payment page...</p>
+            <p style="font-size: var(--text-sm); color: var(--text-muted); margin-top: var(--sp-2);">If you are not redirected automatically, click below.</p>
+            <a href="{{ khalti_redirect_url }}" class="btn btn-primary" style="margin-top: var(--sp-3);">
+                <i class="fas fa-external-link"></i> Go to Khalti
+            </a>
+        </div>
+        <script>
+            (function() {
+                window.location.href = "{{ khalti_redirect_url|escapejs }}";
+            })();
+        </script>
+        {% else %}
+        <div style="text-align:center; padding: var(--sp-4); margin: var(--sp-4) 0; background: var(--bg-alt); border-radius: var(--r-md);">
+            <p><i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i> Khalti payment is not configured.</p>
+        </div>
+        {% endif %}
 
         <div class="payment-info">
-            <p><i class="fas fa-info-circle"></i> In demo mode, any phone number and PIN will work.</p>
             <p><i class="fas fa-shield-halved"></i> Your payment information is encrypted and secure.</p>
         </div>
 
@@ -71,35 +66,4 @@
         </div>
     </div>
 </div>
-
-<script>
-(function() {
-    var form = document.getElementById('khaltiForm');
-    var phone = document.getElementById('khaltiPhone');
-    var pin = document.getElementById('khaltiPin');
-    var tokenField = document.getElementById('khaltiToken');
-    var phoneHidden = document.getElementById('khaltiPhoneHidden');
-    var pinHidden = document.getElementById('khaltiPinHidden');
-
-    phone.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
-    });
-
-    form.addEventListener('submit', function(e) {
-        var errs = [];
-        if (phone.value.length !== 10) errs.push('Enter a valid 10-digit phone number.');
-        if (pin.value.length !== 4 || !/^\d{4}$/.test(pin.value)) errs.push('Enter a valid 4-digit PIN.');
-
-        if (errs.length > 0) {
-            e.preventDefault();
-            alert(errs.join('\n'));
-            return;
-        }
-
-        tokenField.value = 'demo_token_' + Date.now();
-        phoneHidden.value = phone.value;
-        pinHidden.value = pin.value;
-    });
-})();
-</script>
 {% endblock %}

@@ -234,6 +234,13 @@
     var errors = document.getElementById('checkoutErrors');
     var errorList = document.getElementById('errorList');
 
+    function getCookie(name) {
+        var value = '; ' + document.cookie;
+        var parts = value.split('; ' + name + '=');
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return '';
+    }
+
     function buildAddress() {
         var parts = [];
         if (street.value) parts.push(street.value);
@@ -250,12 +257,10 @@
         el.addEventListener('change', buildAddress);
     });
 
-    // Phone validation
     phone.addEventListener('input', function() {
         this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
     });
 
-    // Payment method toggle
     var paymentRadios = document.querySelectorAll('input[name="payment_method"]');
     var cardDetails = document.getElementById('cardDetails');
     var submitBtn = document.getElementById('checkoutBtn');
@@ -275,8 +280,15 @@
         });
     });
 
-    // Form validation
-    form.addEventListener('submit', function(e) {
+    function showErrors(errs) {
+        errors.style.display = 'block';
+        errorList.innerHTML = errs.map(function(err) {
+            return '<div class="error-item"><i class="fas fa-exclamation-circle"></i> ' + err + '</div>';
+        }).join('');
+        errors.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function validateForm() {
         var errs = [];
         var fname = document.getElementById('full_name').value.trim();
         var email = document.getElementById('email').value.trim();
@@ -308,12 +320,70 @@
             if (!cardName) errs.push('Name on card is required');
         }
 
-        if (errs.length > 0) {
-            e.preventDefault();
-            errors.style.display = 'block';
-            errorList.innerHTML = errs.map(function(err) { return '<div class="error-item"><i class="fas fa-exclamation-circle"></i> ' + err + '</div>'; }).join('');
-            errors.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return errs;
+    }
+
+    form.addEventListener('submit', function(e) {
+        var selectedPayment = document.querySelector('input[name="payment_method"]:checked').value;
+
+        if (selectedPayment !== 'khalti') {
+            var errs = validateForm();
+            if (errs.length > 0) {
+                e.preventDefault();
+                showErrors(errs);
+            }
+            return;
         }
+
+        e.preventDefault();
+
+        var errs = validateForm();
+        if (errs.length > 0) {
+            showErrors(errs);
+            return;
+        }
+
+        errors.style.display = 'none';
+
+        var payload = {
+            full_name: document.getElementById('full_name').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            phone: phone.value.trim(),
+            province: province.value,
+            city: city.value.trim(),
+            ward: ward.value.trim(),
+            municipality: municipality.value.trim(),
+            street_address: street.value.trim(),
+            notes: (document.querySelector('textarea[name="notes"]') || {}).value || ''
+        };
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting to Khalti...';
+
+        fetch('{% url "khalti_initiate" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(function(resp) { return resp.json(); })
+        .then(function(data) {
+            if (data.success && data.payment_url) {
+                window.location.href = data.payment_url;
+            } else {
+                var errMsgs = data.errors || [data.error || 'Payment initiation failed.'];
+                showErrors(errMsgs);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-mobile-screen-button"></i> Pay with Khalti — Rs. {{ total|floatformat:0 }}';
+            }
+        })
+        .catch(function(err) {
+            showErrors(['Could not connect to Khalti. Please try again.']);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-mobile-screen-button"></i> Pay with Khalti — Rs. {{ total|floatformat:0 }}';
+        });
     });
 
     buildAddress();

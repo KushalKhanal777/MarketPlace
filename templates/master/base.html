@@ -539,38 +539,31 @@
 
     (function() {
         var slides = document.querySelectorAll('.hero-slide');
-        var dots = document.querySelectorAll('.hero-dot');
-        var prevBtn = document.querySelector('.hero-arrow-prev');
-        var nextBtn = document.querySelector('.hero-arrow-next');
+        var prevBtn = document.querySelector('.hero-nav-prev');
+        var nextBtn = document.querySelector('.hero-nav-next');
+        var counterCurrent = document.querySelector('.hero-counter-current');
         if (slides.length < 2) return;
         var current = 0;
-        var interval = 5000;
+        var interval = 6000;
         var timer;
         var paused = false;
 
+        function updateCounter() {
+            if (counterCurrent) counterCurrent.textContent = String(current + 1).padStart(2, '0');
+        }
+
         function goToSlide(index) {
             slides[current].classList.remove('active');
-            dots[current].classList.remove('active');
             current = index;
             slides[current].classList.add('active');
-            dots[current].classList.add('active');
+            updateCounter();
         }
 
         function nextSlide() { goToSlide((current + 1) % slides.length); }
         function prevSlide() { goToSlide((current - 1 + slides.length) % slides.length); }
 
-        function startTimer() { clearInterval(timer); timer = setInterval(nextSlide, interval); }
+        function startTimer() { stopTimer(); timer = setInterval(nextSlide, interval); }
         function stopTimer() { clearInterval(timer); }
-
-        dots.forEach(function(dot) {
-            dot.addEventListener('click', function(e) {
-                e.stopPropagation();
-                var idx = parseInt(this.dataset.slide);
-                goToSlide(idx);
-                paused = false;
-                startTimer();
-            });
-        });
 
         if (prevBtn) {
             prevBtn.addEventListener('click', function(e) {
@@ -593,14 +586,36 @@
         var carousel = document.querySelector('.hero-carousel');
         if (carousel) {
             carousel.addEventListener('click', function(e) {
-                if (e.target.closest('.hero-dot') || e.target.closest('.hero-arrow') || e.target.closest('.hero-actions') || e.target.closest('a') || e.target.closest('.hero-float-product')) return;
+                if (e.target.closest('.hero-nav') || e.target.closest('.hero-actions') || e.target.closest('a') || e.target.closest('.hero-stack-card')) return;
                 nextSlide();
             });
             carousel.addEventListener('mouseenter', function() { if (!paused) stopTimer(); });
             carousel.addEventListener('mouseleave', function() { if (!paused) startTimer(); });
         }
 
+        updateCounter();
         startTimer();
+    })();
+
+    // Sale countdown timer
+    (function() {
+        var h = document.getElementById('timer-hours');
+        var m = document.getElementById('timer-mins');
+        var s = document.getElementById('timer-secs');
+        if (!h || !m || !s) return;
+        var total = 23 * 3600 + 59 * 60 + 45;
+        function tick() {
+            if (total <= 0) total = 24 * 3600;
+            var hh = Math.floor(total / 3600);
+            var mm = Math.floor((total % 3600) / 60);
+            var ss = total % 60;
+            h.textContent = String(hh).padStart(2, '0');
+            m.textContent = String(mm).padStart(2, '0');
+            s.textContent = String(ss).padStart(2, '0');
+            total--;
+        }
+        tick();
+        setInterval(tick, 1000);
     })();
 
     // Newsletter AJAX

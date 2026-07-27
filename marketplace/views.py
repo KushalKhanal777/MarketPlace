@@ -1,12 +1,14 @@
 import random
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, F
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
+from django.conf import settings
 
 from products.models import Product, Category, Review, Wishlist, Order, OrderItem, Subscriber, SellerProfile, Payout, SellerApplication, ContentReport
 
@@ -587,18 +589,17 @@ def checkout_view(request):
                 price=item.product.discount_price or item.product.price,
                 quantity=item.quantity,
             )
-            from django.db.models import F
             Product.objects.filter(id=item.product.id).update(stock=F('stock') - item.quantity)
+
+        if payment_method in ('khalti', 'esewa'):
+            request.session['pending_order_id'] = order.id
+            return redirect('khalti_payment' if payment_method == 'khalti' else 'esewa_payment', order_id=order.id)
 
         cart.items.all().delete()
         cart.coupon = None
         cart.save()
 
-        if payment_method == 'esewa':
-            return redirect('esewa_payment', order_id=order.id)
-        elif payment_method == 'khalti':
-            return redirect('khalti_payment', order_id=order.id)
-        elif payment_method == 'card':
+        if payment_method == 'card':
             order.transaction_id = 'CARD' + str(order.id)
             order.payment_status = 'completed'
             order.status = 'processing'
@@ -618,6 +619,7 @@ def checkout_view(request):
         'coupon_discount': cart.coupon_discount,
         'total': cart.total_price,
         'savings': cart.savings,
+        'khalti_public_key': settings.KHALTI_PUBLIC_KEY,
     }
     return render(request, 'checkout/checkout.html', context)
 
@@ -695,67 +697,237 @@ def esewa_fail_view(request, order_id):
 
 
 @login_required
+@require_POST
+def khalti_initiate_view(request):
+    """
+    JSON API endpoint to initiate Khalti ePayment.
+
+    Accepts POST with checkout form data, creates the order,
+    calls the official Khalti API, and returns JSON:
+    { "success": true, "payment_url": "...", "pidx": "..." }
+    """
+    from cart.views import get_or_create_cart
+
+    cart = get_or_create_cart(request)
+    items = cart.items.select_related('product', 'product__category').all()
+
+    if not items.exists():
+        return JsonResponse({'success': False, 'error': 'Your cart is empty.'}, status=400)
+
+    try:
+        body = json.loads(request.body) if request.content_type == 'application/json' else request.POST
+    except (json.JSONDecodeError, ValueError):
+        return JsonResponse({'success': False, 'error': 'Invalid request data.'}, status=400)
+
+    full_name = body.get('full_name', '').strip()
+    phone = body.get('phone', '').strip()
+    email = body.get('email', '').strip()
+    province = body.get('province', '').strip()
+    city = body.get('city', '').strip()
+    ward = body.get('ward', '').strip()
+    municipality = body.get('municipality', '').strip()
+    street_address = body.get('street_address', '').strip()
+    notes = body.get('notes', '').strip()
+
+    errors = []
+    if not full_name:
+        errors.append('Full name is required.')
+    if not phone or len(phone) != 10 or not phone.isdigit():
+        errors.append('Phone number must be exactly 10 digits.')
+    if not email or '@' not in email:
+        errors.append('Valid email is required.')
+    if not province:
+        errors.append('Province is required.')
+    if not city:
+        errors.append('District is required.')
+    if not ward:
+        errors.append('Ward number is required.')
+    if not municipality:
+        errors.append('Municipality/VDC is required.')
+    if not street_address:
+        errors.append('Street address is required.')
+
+    if errors:
+        return JsonResponse({'success': False, 'errors': errors}, status=400)
+
+    stock_errors = []
+    for item in items:
+        if item.product.stock < item.quantity:
+            stock_errors.append(f'"{item.product.product_name}" is out of stock (requested: {item.quantity}, available: {item.product.stock}).')
+    if stock_errors:
+        return JsonResponse({'success': False, 'errors': stock_errors}, status=400)
+
+    shipping_address = f'{street_address}, Ward {ward}, {municipality}, {city}, {province}'
+
+    order = Order.objects.create(
+        user=request.user,
+        total_amount=cart.total_price,
+        shipping_address=shipping_address,
+        phone=phone,
+        email=email,
+        full_name=full_name,
+        province=province,
+        city=city,
+        ward=ward,
+        payment_method='khalti',
+        payment_status='pending',
+        notes=notes,
+    )
+
+    for item in items:
+        OrderItem.objects.create(
+            order=order,
+            product=item.product,
+            price=item.product.discount_price or item.product.price,
+            quantity=item.quantity,
+        )
+        Product.objects.filter(id=item.product.id).update(stock=F('stock') - item.quantity)
+
+    request.session['pending_order_id'] = order.id
+
+    try:
+        from marketplace.services.khalti_service import initiate_payment
+        result = initiate_payment(order, request)
+    except ValueError as e:
+        for item in items:
+            Product.objects.filter(id=item.product.id).update(stock=F('stock') + item.quantity)
+        order.payment_status = 'failed'
+        order.save()
+        return JsonResponse({'success': False, 'error': str(e)}, status=402)
+
+    Order.objects.filter(id=order.id).update(transaction_id=result['pidx'])
+
+    return JsonResponse({
+        'success': True,
+        'payment_url': result['payment_url'],
+        'pidx': result['pidx'],
+    })
+
+
+@login_required
 def khalti_payment_view(request, order_id):
-    """Redirect to Khalti payment gateway."""
+    """Initiate Khalti payment by calling the API and redirecting to Khalti."""
     order = get_object_or_404(Order, id=order_id, user=request.user, payment_method='khalti')
+
     if order.payment_status == 'completed':
         messages.info(request, 'This order has already been paid.')
         return redirect('order_confirmation', order_id=order.id)
 
-    khalti_config = {
-        'public_key': 'test_public_key_XXXX',
-        'product_identity': order.order_number,
-        'product_name': f'Order {order.order_number}',
-        'product_url': request.build_absolute_uri(f'/order/{order.id}/confirmation/'),
-        'amount': int(float(order.total_amount) * 100),  # Amount in paisa
-    }
+    if not settings.KHALTI_SECRET_KEY:
+        messages.error(request, 'Khalti payment is not configured. Please try a different payment method.')
+        return redirect('checkout')
+
+    try:
+        from marketplace.services.khalti_service import initiate_payment
+        result = initiate_payment(order, request)
+    except ValueError as e:
+        messages.error(request, str(e))
+        return redirect('checkout')
+
+    Order.objects.filter(id=order.id).update(transaction_id=result['pidx'])
 
     return render(request, 'checkout/khalti_payment.html', {
         'order': order,
-        'khalti_config': khalti_config,
+        'khalti_redirect_url': result['payment_url'],
     })
 
 
 @login_required
 def khalti_verify_view(request, order_id):
-    """Verify Khalti payment and update order."""
-    if request.method != 'POST':
+    """Handle return from Khalti after payment attempt."""
+    from cart.views import get_or_create_cart
+
+    pidx = request.GET.get('pidx')
+    order = get_object_or_404(Order, id=order_id, user=request.user, payment_method='khalti')
+
+    if not pidx:
+        messages.error(request, 'Invalid Khalti response. No payment reference found.')
         return redirect('checkout')
 
+    if order.transaction_id and order.transaction_id != pidx:
+        messages.error(request, 'Payment reference does not match this order.')
+        return redirect('checkout')
+
+    try:
+        from marketplace.services.khalti_service import verify_payment
+        result = verify_payment(pidx)
+    except ValueError as e:
+        messages.error(request, str(e))
+        order.payment_status = 'failed'
+        order.save()
+        _restore_stock(order)
+        return redirect('checkout')
+
+    khalti_status = result.get('status', '').upper()
+    txn_id = result.get('transaction_id', '')
+    paid_amount = result.get('amount', 0)
+    expected_amount = int(float(order.total_amount) * 100)
+
+    if paid_amount != expected_amount:
+        order.payment_status = 'failed'
+        order.save()
+        _restore_stock(order)
+        messages.error(request, 'Payment amount mismatch. Please contact support.')
+        return redirect('checkout')
+
+    if khalti_status == 'COMPLETE':
+        order.payment_status = 'completed'
+        order.transaction_id = txn_id or pidx
+        order.status = 'processing'
+        order.save()
+        _clear_cart(request)
+        messages.success(request, f'Khalti payment successful! Order {order.order_number} confirmed.')
+        return redirect('order_confirmation', order_id=order.id)
+    elif khalti_status == 'PENDING':
+        messages.warning(request, 'Your Khalti payment is pending. We will confirm shortly.')
+        order.payment_status = 'pending'
+        order.save()
+        return redirect('order_confirmation', order_id=order.id)
+    else:
+        order.payment_status = 'failed'
+        order.save()
+        _restore_stock(order)
+        messages.error(request, f'Khalti payment failed (status: {khalti_status}). Please try again.')
+        return redirect('checkout')
+
+
+def _restore_stock(order):
+    """Restore stock for all items in an order."""
+    for item in order.items.select_related('product').all():
+        Product.objects.filter(id=item.product.id).update(stock=F('stock') + item.quantity)
+
+
+def _clear_cart(request):
+    """Clear the user's cart after successful payment."""
+    from cart.views import get_or_create_cart
+    cart = get_or_create_cart(request)
+    cart.items.all().delete()
+    cart.coupon = None
+    cart.save()
+
+
+@login_required
+def khalti_failure_view(request, order_id):
+    """Handle Khalti payment failure."""
     order = get_object_or_404(Order, id=order_id, user=request.user, payment_method='khalti')
-    token = request.POST.get('token', '')
-    phone = request.POST.get('khaltiPhone', '').strip()
-    pin = request.POST.get('khaltiPin', '').strip()
-
-    errs = []
-    if not phone or len(phone) != 10 or not phone.isdigit():
-        errs.append('Valid 10-digit phone number is required.')
-    if not pin or len(pin) != 4 or not pin.isdigit():
-        errs.append('Valid 4-digit PIN is required.')
-    if not token:
-        errs.append('Payment token generation failed. Please try again.')
-
-    if errs:
+    if order.payment_status != 'failed':
         order.payment_status = 'failed'
         order.save()
-        for err in errs:
-            messages.error(request, err)
-        return redirect('khalti_payment', order_id=order.id)
+        _restore_stock(order)
+    messages.error(request, 'Khalti payment failed. Please try again or choose a different payment method.')
+    return redirect('checkout')
 
-    # In production, verify token with Khalti API
-    # For demo: PIN "0000" fails, any other 4-digit PIN succeeds
-    if pin == '0000':
+
+@login_required
+def khalti_cancel_view(request, order_id):
+    """Handle Khalti payment cancellation."""
+    order = get_object_or_404(Order, id=order_id, user=request.user, payment_method='khalti')
+    if order.payment_status != 'failed':
         order.payment_status = 'failed'
         order.save()
-        messages.error(request, 'Khalti payment failed: Invalid PIN. Please check your PIN and try again.')
-        return redirect('khalti_payment', order_id=order.id)
-
-    order.payment_status = 'completed'
-    order.transaction_id = 'KHL' + token[:10]
-    order.status = 'processing'
-    order.save()
-    messages.success(request, f'Khalti payment successful! Order {order.order_number} confirmed.')
-    return redirect('order_confirmation', order_id=order.id)
+        _restore_stock(order)
+    messages.warning(request, 'You cancelled the Khalti payment. You can try again or choose a different payment method.')
+    return redirect('checkout')
 
 
 # ========== SELLER APPLICATION ==========

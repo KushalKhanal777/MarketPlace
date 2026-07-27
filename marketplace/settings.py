@@ -1,7 +1,9 @@
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-q^x$7wm(a**fm=dc@dj0$e^l6*a*&&l2k7upl4+%$^xiesadl+')
@@ -126,6 +128,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
+
+
+# =============================================================================
+# KHALTI ePAYMENT API (Sandbox)
+# =============================================================================
+KHALTI_SECRET_KEY = os.environ.get('KHALTI_SECRET_KEY', '')
+KHALTI_PUBLIC_KEY = os.environ.get('KHALTI_PUBLIC_KEY', '')
+KHALTI_API_BASE_URL = os.environ.get('KHALTI_API_BASE_URL', 'https://dev.khalti.com/api/v2')
+SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000')
 LOGOUT_REDIRECT_URL = 'home'
 
 JAZZMIN_SETTINGS = {

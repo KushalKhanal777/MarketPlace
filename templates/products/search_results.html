@@ -4,83 +4,24 @@
 {% block title %}{% if query %}Search: {{ query }}{% else %}Search Products{% endif %} - Islington Marketplace{% endblock %}
 
 {% block content %}
-<!-- Ad Banner Hero -->
-<section class="ad-hero" id="adHero">
-    <div class="ad-hero-slides">
-        <div class="ad-hero-slide active" data-slide="0">
-            <div class="ad-hero-bg ad-hero-bg-1"></div>
-            <div class="ad-hero-content">
-                <div class="ad-hero-text">
-                    <span class="ad-hero-badge"><i class="fas fa-bolt"></i> Flash Sale</span>
-                    <h2 class="ad-hero-title">Up to 50% Off Electronics</h2>
-                    <p class="ad-hero-subtitle">Limited time offer on top brands. Don't miss out!</p>
-                    <a href="{% url 'products' %}?category=electronics" class="btn btn-primary btn-sm"><i class="fas fa-shopping-bag"></i> Shop Now</a>
-                </div>
-                <div class="ad-hero-visual">
-                    <div class="ad-hero-discount">
-                        <span class="ad-hero-discount-number">50</span>
-                        <span class="ad-hero-discount-symbol">%<span>OFF</span></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="ad-hero-slide" data-slide="1">
-            <div class="ad-hero-bg ad-hero-bg-2"></div>
-            <div class="ad-hero-content">
-                <div class="ad-hero-text">
-                    <span class="ad-hero-badge"><i class="fas fa-truck-fast"></i> Free Delivery</span>
-                    <h2 class="ad-hero-title">Free Shipping Over Rs. 5,000</h2>
-                    <p class="ad-hero-subtitle">No minimum purchase required. Fast delivery across Nepal.</p>
-                    <a href="{% url 'products' %}" class="btn btn-primary btn-sm"><i class="fas fa-arrow-right"></i> Browse Products</a>
-                </div>
-                <div class="ad-hero-visual">
-                    <div class="ad-hero-icon-wrap">
-                        <i class="fas fa-truck-fast"></i>
-                        <span class="ad-hero-free-tag">FREE</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="ad-hero-slide" data-slide="2">
-            <div class="ad-hero-bg ad-hero-bg-3"></div>
-            <div class="ad-hero-content">
-                <div class="ad-hero-text">
-                    <span class="ad-hero-badge"><i class="fas fa-star"></i> New Arrivals</span>
-                    <h2 class="ad-hero-title">Discover What's New</h2>
-                    <p class="ad-hero-subtitle">Fresh picks added daily. Be the first to shop new trends.</p>
-                    <a href="{% url 'search' %}?sort=newest" class="btn btn-primary btn-sm"><i class="fas fa-sparkles"></i> Explore New</a>
-                </div>
-                <div class="ad-hero-visual">
-                    <div class="ad-hero-icon-wrap">
-                        <i class="fas fa-certificate"></i>
-                        <span class="ad-hero-free-tag">NEW</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="ad-hero-slide" data-slide="3">
-            <div class="ad-hero-bg ad-hero-bg-4"></div>
-            <div class="ad-hero-content">
-                <div class="ad-hero-text">
-                    <span class="ad-hero-badge"><i class="fas fa-shield-halved"></i> Trust</span>
-                    <h2 class="ad-hero-title">100% Secure Checkout</h2>
-                    <p class="ad-hero-subtitle">Shop with confidence. Easy returns within 30 days.</p>
-                    <a href="{% url 'about' %}" class="btn btn-primary btn-sm"><i class="fas fa-shield-halved"></i> Why Us</a>
-                </div>
-                <div class="ad-hero-visual">
-                    <div class="ad-hero-icon-wrap">
-                        <i class="fas fa-shield-halved"></i>
-                        <span class="ad-hero-free-tag">SAFE</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!-- Hero Banner -->
+<section class="page-hero page-hero-search" id="pageHero">
+    <div class="page-hero-bg">
+        <div class="page-hero-mesh"></div>
+        <div class="page-hero-orb page-hero-orb-1"></div>
+        <div class="page-hero-orb page-hero-orb-2"></div>
     </div>
-    <div class="ad-hero-dots">
-        <button class="ad-hero-dot active" data-slide="0" aria-label="Slide 1"></button>
-        <button class="ad-hero-dot" data-slide="1" aria-label="Slide 2"></button>
-        <button class="ad-hero-dot" data-slide="2" aria-label="Slide 3"></button>
-        <button class="ad-hero-dot" data-slide="3" aria-label="Slide 4"></button>
+    <div class="page-hero-content">
+        <div class="page-hero-text">
+            <div class="page-hero-badge"><i class="fas fa-search"></i> Search</div>
+            {% if query %}
+            <h1 class="page-hero-title">Results for<br>"<span class="page-hero-accent">{{ query }}</span>"</h1>
+            <p class="page-hero-desc">{{ products.paginator.count }} product{{ products.paginator.count|pluralize }} found</p>
+            {% else %}
+            <h1 class="page-hero-title">Find Your<br><span class="page-hero-accent">Perfect Item</span></h1>
+            <p class="page-hero-desc">Search through thousands of products from trusted sellers</p>
+            {% endif %}
+        </div>
     </div>
 </section>
 
@@ -133,14 +74,14 @@
                     <li><a href="{% url 'search' %}?q={{ query }}" class="{% if not selected_category %}active{% endif %}"><span class="category-list-icon"><i class="fas fa-store"></i></span> All Categories</a></li>
                     {% for cat in categories %}
                     <li><a href="{% url 'search' %}?q={{ query }}&category={{ cat.slug }}" class="{% if selected_category == cat.slug %}active{% endif %}"><span class="category-list-icon">
-                        {% if cat.icon == 'fa-spa' %}<img src="{% static 'images/cat-beauty.svg' %}" alt="">
-                        {% elif cat.icon == 'fa-book' %}<img src="{% static 'images/cat-books.svg' %}" alt="">
-                        {% elif cat.icon == 'fa-shirt' %}<img src="{% static 'images/cat-clothes.svg' %}" alt="">
-                        {% elif cat.icon == 'fa-microchip' %}<img src="{% static 'images/cat-electronics.svg' %}" alt="">
-                        {% elif cat.icon == 'fa-house' %}<img src="{% static 'images/cat-home.svg' %}" alt="">
-                        {% elif cat.icon == 'fa-dumbbell' %}<img src="{% static 'images/cat-sports.svg' %}" alt="">
-                        {% elif cat.icon == 'fa-box' %}<img src="{% static 'images/cat-alcohol.svg' %}" alt="">
-                        {% elif cat.icon == 'fa-utensils' %}<img src="{% static 'images/cat-food.svg' %}" alt="">
+                        {% if cat.icon == 'fa-spa' %}<i class="fas fa-spa"></i>
+                        {% elif cat.icon == 'fa-book' %}<i class="fas fa-book-open"></i>
+                        {% elif cat.icon == 'fa-shirt' %}<i class="fas fa-shirt"></i>
+                        {% elif cat.icon == 'fa-microchip' %}<i class="fas fa-microchip"></i>
+                        {% elif cat.icon == 'fa-house' %}<i class="fas fa-house-chimney"></i>
+                        {% elif cat.icon == 'fa-dumbbell' %}<i class="fas fa-dumbbell"></i>
+                        {% elif cat.icon == 'fa-box' %}<i class="fas fa-wine-glass"></i>
+                        {% elif cat.icon == 'fa-utensils' %}<i class="fas fa-utensils"></i>
                         {% else %}<i class="fas fa-tag"></i>
                         {% endif %}
                     </span> {{ cat.name }}</a></li>
@@ -255,43 +196,6 @@
 
 {% block extra_js %}
 <script>
-// Ad Hero Carousel
-(function() {
-    var slides = document.querySelectorAll('.ad-hero-slide');
-    var dots = document.querySelectorAll('.ad-hero-dot');
-    if (slides.length < 2) return;
-    var current = 0;
-    var interval = 4000;
-    var timer;
-
-    function goToSlide(index) {
-        slides[current].classList.remove('active');
-        dots[current].classList.remove('active');
-        current = index;
-        slides[current].classList.add('active');
-        dots[current].classList.add('active');
-    }
-
-    function nextSlide() { goToSlide((current + 1) % slides.length); }
-
-    function startTimer() { clearInterval(timer); timer = setInterval(nextSlide, interval); }
-
-    dots.forEach(function(dot) {
-        dot.addEventListener('click', function() {
-            goToSlide(parseInt(this.dataset.slide));
-            startTimer();
-        });
-    });
-
-    var hero = document.getElementById('adHero');
-    if (hero) {
-        hero.addEventListener('mouseenter', function() { clearInterval(timer); });
-        hero.addEventListener('mouseleave', function() { startTimer(); });
-    }
-
-    startTimer();
-})();
-
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {

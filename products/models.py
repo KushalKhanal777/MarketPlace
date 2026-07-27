@@ -299,6 +299,13 @@ class Order(models.Model):
         ('refunded', 'Refunded'),
     ]
 
+    PAYMENT_METHOD_CHOICES = [
+        ('cod', 'Cash on Delivery'),
+        ('esewa', 'eSewa'),
+        ('khalti', 'Khalti'),
+        ('card', 'Credit/Debit Card'),
+    ]
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
     order_number = models.CharField(max_length=20, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
@@ -311,7 +318,7 @@ class Order(models.Model):
     province = models.CharField(max_length=100, blank=True)
     city = models.CharField(max_length=100, blank=True)
     ward = models.CharField(max_length=20, blank=True)
-    payment_method = models.CharField(max_length=50, default='cod')
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES, default='cod')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
     transaction_id = models.CharField(max_length=100, blank=True)
     notes = models.TextField(blank=True)

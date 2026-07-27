@@ -73,8 +73,11 @@ urlpatterns = [
     path('payment/esewa/fail/<int:order_id>/', views.esewa_fail_view, name='esewa_fail'),
 
     # Payment - Khalti
+    path('api/payment/khalti/initiate/', views.khalti_initiate_view, name='khalti_initiate'),
     path('payment/khalti/<int:order_id>/', views.khalti_payment_view, name='khalti_payment'),
-    path('payment/khalti/verify/<int:order_id>/', views.khalti_verify_view, name='khalti_verify'),
+    path('payment/khalti/<int:order_id>/verify/', views.khalti_verify_view, name='khalti_verify'),
+    path('payment/khalti/<int:order_id>/failure/', views.khalti_failure_view, name='khalti_failure'),
+    path('payment/khalti/<int:order_id>/cancel/', views.khalti_cancel_view, name='khalti_cancel'),
 ]
 
 if settings.DEBUG:

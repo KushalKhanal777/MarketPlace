@@ -7,119 +7,203 @@
 <!-- Hero Carousel -->
 <section class="hero-carousel" aria-label="Promotions">
     <div class="hero-slides">
-        <!-- Slide 1 -->
+        <!-- Slide 1: Season Launch -->
         <div class="hero-slide active" data-slide="0">
-            <div class="hero-slide-bg slide-bg-1"></div>
-            <div class="hero-shape hero-shape-1"></div>
-            <div class="hero-shape hero-shape-2"></div>
-            {% if hero_products %}
-            <div class="hero-floating-products">
-                {% for p in hero_products|slice:":4" %}
-                <a href="{% url 'product_detail' p.id %}" class="hero-float-product hfp-{{ forloop.counter }}" title="{{ p.product_name }}">
-                    {% if p.product_image %}
-                    <img src="{{ p.product_image.url }}" alt="{{ p.product_name }}">
-                    {% endif %}
-                    <span class="hfp-price">Rs. {{ p.discount_price|default:p.price|floatformat:0 }}</span>
-                </a>
-                {% endfor %}
+            <div class="hero-bg">
+                <div class="hero-mesh"></div>
+                <div class="hero-grid-overlay"></div>
+                <div class="hero-orb hero-orb-1"></div>
+                <div class="hero-orb hero-orb-2"></div>
+                <div class="hero-orb hero-orb-3"></div>
             </div>
-            {% endif %}
-            <div class="hero-slide-content">
-                <span class="hero-badge"><i class="fas fa-bolt"></i> New Season 2026</span>
-                <h1>Discover Quality Products You'll Love</h1>
-                <p>Shop from trusted sellers across Nepal. Curated collections, unbeatable prices, and a seamless experience.</p>
-                <div class="hero-actions">
-                    <a href="{% url 'products' %}" class="btn btn-primary"><i class="fas fa-shopping-bag"></i> Shop Now</a>
-                    <a href="{% url 'search' %}?sort=popular" class="btn btn-outline"><i class="fas fa-fire"></i> Best Sellers</a>
+            <div class="hero-content-row">
+                <div class="hero-slide-content">
+                    <div class="hero-badge-pill"><span class="hero-badge-dot"></span> New Season 2026</div>
+                    <h1 class="hero-title">Discover Quality<br>Products You'll<br><span class="hero-title-accent">Love</span></h1>
+                    <p class="hero-desc">Shop from trusted sellers across Nepal. Curated collections, unbeatable prices, and a seamless experience.</p>
+                    <div class="hero-actions">
+                        <a href="{% url 'products' %}" class="btn-hero-primary"><span>Shop Now</span><i class="fas fa-arrow-right"></i></a>
+                        <a href="{% url 'search' %}?sort=popular" class="btn-hero-ghost"><i class="fas fa-fire"></i> Best Sellers</a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="hero-stat"><span class="hero-stat-num">10K+</span><span class="hero-stat-label">Products</span></div>
+                        <div class="hero-stat-divider"></div>
+                        <div class="hero-stat"><span class="hero-stat-num">500+</span><span class="hero-stat-label">Sellers</span></div>
+                        <div class="hero-stat-divider"></div>
+                        <div class="hero-stat"><span class="hero-stat-num">4.9<i class="fas fa-star"></i></span><span class="hero-stat-label">Rating</span></div>
+                    </div>
                 </div>
+                {% if hero_products %}
+                <div class="hero-visual">
+                    <div class="hero-product-stack">
+                        {% for p in hero_products|slice:":3" %}
+                        <a href="{% url 'product_detail' p.id %}" class="hero-stack-card hsc-{{ forloop.counter }}" title="{{ p.product_name }}">
+                            {% if p.product_image %}
+                            <img src="{{ p.product_image.url }}" alt="{{ p.product_name }}">
+                            {% endif %}
+                            <div class="hero-stack-info">
+                                <span class="hero-stack-price">Rs. {{ p.discount_price|default:p.price|floatformat:0 }}</span>
+                                <span class="hero-stack-name">{{ p.product_name|truncatechars:18 }}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
-        <!-- Slide 2 -->
+
+        <!-- Slide 2: Mega Sale -->
         <div class="hero-slide" data-slide="1">
-            <div class="hero-slide-bg slide-bg-2"></div>
-            <div class="hero-shape hero-shape-3"></div>
-            <div class="hero-shape hero-shape-4"></div>
-            {% if hero_products %}
-            <div class="hero-floating-products">
-                {% for p in hero_products|slice:"4:8" %}
-                <a href="{% url 'product_detail' p.id %}" class="hero-float-product hfp-{{ forloop.counter }}" title="{{ p.product_name }}">
-                    {% if p.product_image %}
-                    <img src="{{ p.product_image.url }}" alt="{{ p.product_name }}">
-                    {% endif %}
-                    <span class="hfp-price">Rs. {{ p.discount_price|default:p.price|floatformat:0 }}</span>
-                </a>
-                {% endfor %}
+            <div class="hero-bg hero-bg-sale">
+                <div class="hero-mesh"></div>
+                <div class="hero-grid-overlay"></div>
+                <div class="hero-orb hero-orb-1"></div>
+                <div class="hero-orb hero-orb-2"></div>
+                <div class="hero-orb hero-orb-3"></div>
             </div>
-            {% endif %}
-            <div class="hero-slide-content">
-                <span class="hero-badge"><i class="fas fa-percent"></i> Up to 50% Off</span>
-                <h1>Mega Sale Is Live Now</h1>
-                <p>Grab unbeatable deals on Electronics, Fashion, Beauty & more. Limited time offers — don't miss out!</p>
-                <div class="hero-actions">
-                    <a href="{% url 'products' %}" class="btn btn-primary"><i class="fas fa-fire"></i> Shop the Sale</a>
-                    <a href="{% url 'search' %}?sort=popular" class="btn btn-outline"><i class="fas fa-clock"></i> Deals Ending Soon</a>
+            <div class="hero-content-row">
+                <div class="hero-slide-content">
+                    <div class="hero-badge-pill hero-badge-red"><span class="hero-badge-dot"></span> Up to 50% Off</div>
+                    <h1 class="hero-title">Mega Sale<br>Is <span class="hero-title-accent hero-accent-red">Live Now</span></h1>
+                    <p class="hero-desc">Grab unbeatable deals on Electronics, Fashion, Beauty & more. Limited time offers — don't miss out!</p>
+                    <div class="hero-actions">
+                        <a href="{% url 'products' %}" class="btn-hero-primary btn-hero-red"><span>Shop the Sale</span><i class="fas fa-arrow-right"></i></a>
+                        <a href="{% url 'search' %}?sort=popular" class="btn-hero-ghost"><i class="fas fa-clock"></i> Ending Soon</a>
+                    </div>
+                    <div class="hero-timer">
+                        <div class="hero-timer-item"><span class="hero-timer-num" id="timer-hours">23</span><span class="hero-timer-label">Hrs</span></div>
+                        <span class="hero-timer-sep">:</span>
+                        <div class="hero-timer-item"><span class="hero-timer-num" id="timer-mins">59</span><span class="hero-timer-label">Min</span></div>
+                        <span class="hero-timer-sep">:</span>
+                        <div class="hero-timer-item"><span class="hero-timer-num" id="timer-secs">45</span><span class="hero-timer-label">Sec</span></div>
+                    </div>
                 </div>
+                {% if hero_products %}
+                <div class="hero-visual">
+                    <div class="hero-product-stack">
+                        {% for p in hero_products|slice:"3:6" %}
+                        <a href="{% url 'product_detail' p.id %}" class="hero-stack-card hsc-{{ forloop.counter }}" title="{{ p.product_name }}">
+                            {% if p.product_image %}
+                            <img src="{{ p.product_image.url }}" alt="{{ p.product_name }}">
+                            {% endif %}
+                            <div class="hero-stack-info">
+                                <span class="hero-stack-price hero-stack-price-sale">Rs. {{ p.discount_price|default:p.price|floatformat:0 }}</span>
+                                <span class="hero-stack-name">{{ p.product_name|truncatechars:18 }}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
-        <!-- Slide 3 -->
+
+        <!-- Slide 3: Free Shipping -->
         <div class="hero-slide" data-slide="2">
-            <div class="hero-slide-bg slide-bg-3"></div>
-            <div class="hero-shape hero-shape-5"></div>
-            <div class="hero-shape hero-shape-6"></div>
-            {% if hero_products %}
-            <div class="hero-floating-products">
-                {% for p in hero_products|slice:"8:12" %}
-                <a href="{% url 'product_detail' p.id %}" class="hero-float-product hfp-{{ forloop.counter }}" title="{{ p.product_name }}">
-                    {% if p.product_image %}
-                    <img src="{{ p.product_image.url }}" alt="{{ p.product_name }}">
-                    {% endif %}
-                    <span class="hfp-price">Rs. {{ p.discount_price|default:p.price|floatformat:0 }}</span>
-                </a>
-                {% endfor %}
+            <div class="hero-bg hero-bg-ship">
+                <div class="hero-mesh"></div>
+                <div class="hero-grid-overlay"></div>
+                <div class="hero-orb hero-orb-1"></div>
+                <div class="hero-orb hero-orb-2"></div>
+                <div class="hero-orb hero-orb-3"></div>
             </div>
-            {% endif %}
-            <div class="hero-slide-content">
-                <span class="hero-badge"><i class="fas fa-truck-fast"></i> Free Delivery</span>
-                <h1>Free Shipping On Every Order</h1>
-                <p>No minimum purchase required. Fast, reliable delivery right to your doorstep across Nepal.</p>
-                <div class="hero-actions">
-                    <a href="{% url 'products' %}" class="btn btn-primary"><i class="fas fa-shopping-bag"></i> Start Shopping</a>
-                    <a href="{% url 'about' %}" class="btn btn-outline"><i class="fas fa-shield-halved"></i> Why Choose Us</a>
+            <div class="hero-content-row">
+                <div class="hero-slide-content">
+                    <div class="hero-badge-pill hero-badge-green"><span class="hero-badge-dot"></span> Free Delivery</div>
+                    <h1 class="hero-title">Free Shipping<br>On <span class="hero-title-accent hero-accent-green">Every Order</span></h1>
+                    <p class="hero-desc">No minimum purchase required. Fast, reliable delivery right to your doorstep across Nepal.</p>
+                    <div class="hero-actions">
+                        <a href="{% url 'products' %}" class="btn-hero-primary btn-hero-green"><span>Start Shopping</span><i class="fas fa-arrow-right"></i></a>
+                        <a href="{% url 'about' %}" class="btn-hero-ghost"><i class="fas fa-shield-halved"></i> Why Choose Us</a>
+                    </div>
+                    <div class="hero-trust-row">
+                        <div class="hero-trust-item"><i class="fas fa-truck-fast"></i><span>2-3 Day Delivery</span></div>
+                        <div class="hero-trust-item"><i class="fas fa-rotate-left"></i><span>30-Day Returns</span></div>
+                        <div class="hero-trust-item"><i class="fas fa-headset"></i><span>24/7 Support</span></div>
+                    </div>
+                </div>
+                {% if hero_products %}
+                <div class="hero-visual">
+                    <div class="hero-product-stack">
+                        {% for p in hero_products|slice:"6:9" %}
+                        <a href="{% url 'product_detail' p.id %}" class="hero-stack-card hsc-{{ forloop.counter }}" title="{{ p.product_name }}">
+                            {% if p.product_image %}
+                            <img src="{{ p.product_image.url }}" alt="{{ p.product_name }}">
+                            {% endif %}
+                            <div class="hero-stack-info">
+                                <span class="hero-stack-price">Rs. {{ p.discount_price|default:p.price|floatformat:0 }}</span>
+                                <span class="hero-stack-name">{{ p.product_name|truncatechars:18 }}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Slide 4: Trust -->
+        <div class="hero-slide" data-slide="3">
+            <div class="hero-bg hero-bg-trust">
+                <div class="hero-mesh"></div>
+                <div class="hero-grid-overlay"></div>
+                <div class="hero-orb hero-orb-1"></div>
+                <div class="hero-orb hero-orb-2"></div>
+                <div class="hero-orb hero-orb-3"></div>
+            </div>
+            <div class="hero-content-row">
+                <div class="hero-slide-content">
+                    <div class="hero-badge-pill hero-badge-blue"><span class="hero-badge-dot"></span> Trusted Marketplace</div>
+                    <h1 class="hero-title">Shop With<br><span class="hero-title-accent hero-accent-blue">Confidence</span></h1>
+                    <p class="hero-desc">Secure payments, verified sellers, easy 30-day returns. Your satisfaction is our priority.</p>
+                    <div class="hero-actions">
+                        <a href="{% url 'products' %}" class="btn-hero-primary btn-hero-blue"><span>Explore Safe</span><i class="fas fa-arrow-right"></i></a>
+                        <a href="{% url 'about' %}" class="btn-hero-ghost"><i class="fas fa-users"></i> Meet Our Sellers</a>
+                    </div>
+                    <div class="hero-trust-row">
+                        <div class="hero-trust-item"><i class="fas fa-lock"></i><span>Secure Payment</span></div>
+                        <div class="hero-trust-item"><i class="fas fa-user-check"></i><span>Verified Sellers</span></div>
+                        <div class="hero-trust-item"><i class="fas fa-award"></i><span>Quality Guarantee</span></div>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-trust-graphic">
+                        <div class="hero-trust-ring hero-trust-ring-1"><i class="fas fa-shield-halved"></i></div>
+                        <div class="hero-trust-ring hero-trust-ring-2"></div>
+                        <div class="hero-trust-ring hero-trust-ring-3"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Arrow Navigation -->
-    <button class="hero-arrow hero-arrow-prev" aria-label="Previous slide"><i class="fas fa-chevron-left"></i></button>
-    <button class="hero-arrow hero-arrow-next" aria-label="Next slide"><i class="fas fa-chevron-right"></i></button>
+    <!-- Navigation -->
+    <button class="hero-nav hero-nav-prev" aria-label="Previous slide"><i class="fas fa-chevron-left"></i></button>
+    <button class="hero-nav hero-nav-next" aria-label="Next slide"><i class="fas fa-chevron-right"></i></button>
 
-    <!-- Navigation Dots -->
-    <div class="hero-dots">
-        <button class="hero-dot active" data-slide="0" aria-label="Slide 1"></button>
-        <button class="hero-dot" data-slide="1" aria-label="Slide 2"></button>
-        <button class="hero-dot" data-slide="2" aria-label="Slide 3"></button>
-    </div>
+    <!-- Slide Counter -->
+    <div class="hero-counter"><span class="hero-counter-current">01</span> / <span class="hero-counter-total">04</span></div>
 </section>
 
 <!-- Features -->
 <div class="features-grid" data-scroll-stagger data-scroll="fade-up">
     <div class="feature-card">
-        <div class="feature-icon"><i class="fas fa-truck-fast"></i></div>
+        <div class="feature-icon blue"><i class="fas fa-truck-fast"></i></div>
         <div class="feature-info">
             <h3>Free Shipping</h3>
             <p>On all orders over Rs. 5,000</p>
         </div>
     </div>
     <div class="feature-card">
-        <div class="feature-icon" style="background: var(--warning-bg); color: var(--warning);"><i class="fas fa-shield-halved"></i></div>
+        <div class="feature-icon amber"><i class="fas fa-shield-halved"></i></div>
         <div class="feature-info">
             <h3>Secure Payment</h3>
             <p>100% secure checkout</p>
         </div>
     </div>
     <div class="feature-card">
-        <div class="feature-icon" style="background: var(--success-bg); color: var(--success);"><i class="fas fa-rotate-left"></i></div>
+        <div class="feature-icon green"><i class="fas fa-rotate-left"></i></div>
         <div class="feature-info">
             <h3>Easy Returns</h3>
             <p>30-day return policy</p>
@@ -148,21 +232,21 @@
             {% endif %}">
             <div class="category-icon">
                 {% if cat.icon == 'fa-spa' %}
-                    <img src="{% static 'images/cat-beauty.svg' %}" alt="{{ cat.name }}">
+                    <i class="fas fa-spa"></i>
                 {% elif cat.icon == 'fa-book' %}
-                    <img src="{% static 'images/cat-books.svg' %}" alt="{{ cat.name }}">
+                    <i class="fas fa-book-open"></i>
                 {% elif cat.icon == 'fa-shirt' %}
-                    <img src="{% static 'images/cat-clothes.svg' %}" alt="{{ cat.name }}">
+                    <i class="fas fa-shirt"></i>
                 {% elif cat.icon == 'fa-microchip' %}
-                    <img src="{% static 'images/cat-electronics.svg' %}" alt="{{ cat.name }}">
+                    <i class="fas fa-microchip"></i>
                 {% elif cat.icon == 'fa-house' %}
-                    <img src="{% static 'images/cat-home.svg' %}" alt="{{ cat.name }}">
+                    <i class="fas fa-house-chimney"></i>
                 {% elif cat.icon == 'fa-dumbbell' %}
-                    <img src="{% static 'images/cat-sports.svg' %}" alt="{{ cat.name }}">
+                    <i class="fas fa-dumbbell"></i>
                 {% elif cat.icon == 'fa-box' %}
-                    <img src="{% static 'images/cat-alcohol.svg' %}" alt="{{ cat.name }}">
+                    <i class="fas fa-wine-glass"></i>
                 {% elif cat.icon == 'fa-utensils' %}
-                    <img src="{% static 'images/cat-food.svg' %}" alt="{{ cat.name }}">
+                    <i class="fas fa-utensils"></i>
                 {% else %}
                     <i class="fas fa-{{ cat.icon }}"></i>
                 {% endif %}

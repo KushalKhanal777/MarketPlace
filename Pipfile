@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 django = "*"
 django-jazzmin = "*"
+requests = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
