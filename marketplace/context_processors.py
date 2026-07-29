@@ -1,4 +1,4 @@
-from products.models import Cart, Wishlist
+from products.models import Cart, Wishlist, Subscriber
 
 
 def cart_context(request):
@@ -45,3 +45,10 @@ def notifications_context(request):
             'message': str(message),
         })
     return {'toast_messages': messages}
+
+
+def newsletter_context(request):
+    """Make subscriber count available globally for the newsletter section."""
+    return {
+        'subscriber_count': Subscriber.objects.filter(is_active=True).count(),
+    }

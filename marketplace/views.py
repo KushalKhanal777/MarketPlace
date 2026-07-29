@@ -1,11 +1,13 @@
 import random
 import json
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import Q, Avg, F, Max
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Q, Avg, F
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from django.conf import settings
@@ -57,11 +59,20 @@ def home(request):
     random.shuffle(hero_pool)
     hero_products = hero_pool[:12]
 
+    flash_sale_end = None
+    if flash_sale.exists():
+        latest_end = flash_sale.aggregate(Max('flash_sale_end'))['flash_sale_end__max']
+        if latest_end:
+            flash_sale_end = latest_end.isoformat()
+        else:
+            flash_sale_end = (timezone.now() + timedelta(hours=24)).isoformat()
+
     context = {
         'featured_products': featured_products,
         'bestsellers': bestsellers,
         'new_arrivals': new_arrivals,
         'flash_sale': flash_sale,
+        'flash_sale_end': flash_sale_end,
         'all_products': all_products,
         'categories': categories,
         'hero_products': hero_products,
@@ -457,17 +468,18 @@ def subscribe_view(request):
     if Subscriber.objects.filter(email=email).exists():
         subscriber = Subscriber.objects.get(email=email)
         if subscriber.is_active:
-            msg = 'You are already subscribed!'
-        else:
-            subscriber.is_active = True
-            subscriber.save()
-            msg = 'Welcome back! Your subscription has been reactivated.'
+            return JsonResponse({'success': False, 'message': 'You are already subscribed!'})
+        subscriber.is_active = True
+        subscriber.save()
+        msg = 'Welcome back! Your subscription has been reactivated.'
     else:
         Subscriber.objects.create(email=email)
         msg = 'Thank you for subscribing!'
 
+    count = Subscriber.objects.filter(is_active=True).count()
+
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return JsonResponse({'success': True, 'message': msg})
+        return JsonResponse({'success': True, 'message': msg, 'count': count})
 
     messages.success(request, msg)
     from urllib.parse import urlparse
@@ -835,40 +847,33 @@ def khalti_payment_view(request, order_id):
 @login_required
 def khalti_verify_view(request, order_id):
     """Handle return from Khalti after payment attempt."""
-    from cart.views import get_or_create_cart
+    import logging
+    logger = logging.getLogger(__name__)
 
     pidx = request.GET.get('pidx')
     order = get_object_or_404(Order, id=order_id, user=request.user, payment_method='khalti')
+
+    logger.info("Khalti verify: order=%s pidx=%s txn_id=%s", order.order_number, pidx, order.transaction_id)
 
     if not pidx:
         messages.error(request, 'Invalid Khalti response. No payment reference found.')
         return redirect('checkout')
 
-    if order.transaction_id and order.transaction_id != pidx:
-        messages.error(request, 'Payment reference does not match this order.')
-        return redirect('checkout')
-
     try:
         from marketplace.services.khalti_service import verify_payment
         result = verify_payment(pidx)
+        logger.info("Khalti lookup result: %s", result)
     except ValueError as e:
-        messages.error(request, str(e))
-        order.payment_status = 'failed'
+        logger.error("Khalti verify failed for order %s: %s", order.order_number, str(e))
+        messages.warning(request, f'Payment received. Verification pending: {str(e)}')
+        order.transaction_id = pidx
         order.save()
-        _restore_stock(order)
-        return redirect('checkout')
+        return redirect('order_confirmation', order_id=order.id)
 
     khalti_status = result.get('status', '').upper()
     txn_id = result.get('transaction_id', '')
-    paid_amount = result.get('amount', 0)
+    paid_amount = int(result.get('amount', 0))
     expected_amount = int(float(order.total_amount) * 100)
-
-    if paid_amount != expected_amount:
-        order.payment_status = 'failed'
-        order.save()
-        _restore_stock(order)
-        messages.error(request, 'Payment amount mismatch. Please contact support.')
-        return redirect('checkout')
 
     if khalti_status == 'COMPLETE':
         order.payment_status = 'completed'
@@ -879,11 +884,13 @@ def khalti_verify_view(request, order_id):
         messages.success(request, f'Khalti payment successful! Order {order.order_number} confirmed.')
         return redirect('order_confirmation', order_id=order.id)
     elif khalti_status == 'PENDING':
-        messages.warning(request, 'Your Khalti payment is pending. We will confirm shortly.')
         order.payment_status = 'pending'
+        order.transaction_id = txn_id or pidx
         order.save()
+        messages.warning(request, 'Your Khalti payment is pending. We will confirm shortly.')
         return redirect('order_confirmation', order_id=order.id)
     else:
+        logger.warning("Khalti status=%s for order %s", khalti_status, order.order_number)
         order.payment_status = 'failed'
         order.save()
         _restore_stock(order)

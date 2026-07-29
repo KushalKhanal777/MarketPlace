@@ -91,6 +91,7 @@ TEMPLATES = [
                 'pages.context_processors.nav_pages',
                 'marketplace.context_processors.cart_context',
                 'marketplace.context_processors.notifications_context',
+                'marketplace.context_processors.newsletter_context',
             ],
         },
     },

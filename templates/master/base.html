@@ -192,21 +192,39 @@
     </main>
 
     <!-- Newsletter CTA - full width dark strip above footer -->
-    <section class="newsletter-section">
+    <section class="newsletter-section" id="newsletterSection">
         <div class="main-content">
             <div class="newsletter-inner">
                 <div class="newsletter-text">
-                    <h2>Stay in the Loop</h2>
-                    <p>Get exclusive deals, new arrivals, and insider tips delivered to your inbox.</p>
+                    <span class="newsletter-badge">Newsletter</span>
+                    <h2 id="newsletterTitle">Stay in the Loop</h2>
+                    <p id="newsletterDesc">Get exclusive deals, new arrivals, and insider tips delivered to your inbox.</p>
+                    <div class="newsletter-social-proof" id="newsletterSocial">
+                        <span class="newsletter-count"><i class="fas fa-users"></i> <span id="subscriberCount">{{ subscriber_count }}</span>+ subscribers</span>
+                    </div>
                 </div>
-                <form class="newsletter-form" id="newsletterForm" onsubmit="return handleNewsletter(event)">
-                    {% csrf_token %}
-                    <input type="email" name="email" placeholder="Enter your email address" required aria-label="Email address" id="newsletterEmail">
-                    <button type="submit" class="btn btn-accent" id="newsletterBtn">Subscribe <i class="fas fa-arrow-right"></i></button>
-                </form>
-                <div class="newsletter-msg" id="newsletterMsg"></div>
+                <div class="newsletter-action" id="newsletterAction">
+                    <form class="newsletter-form" id="newsletterForm" action="{% url 'subscribe' %}" onsubmit="return handleNewsletter(event)">
+                        {% csrf_token %}
+                        <div class="newsletter-input-group">
+                            <i class="fas fa-envelope newsletter-input-icon"></i>
+                            <input type="email" name="email" placeholder="Your email address" required aria-label="Email address" id="newsletterEmail" autocomplete="email">
+                        </div>
+                        <button type="submit" class="btn btn-accent" id="newsletterBtn"><span>Subscribe</span> <i class="fas fa-arrow-right"></i></button>
+                    </form>
+                    <div class="newsletter-msg" id="newsletterMsg"></div>
+                </div>
+                <div class="newsletter-success" id="newsletterSuccess" style="display:none">
+                    <div class="newsletter-success-icon"><i class="fas fa-check"></i></div>
+                    <div class="newsletter-success-text">
+                        <strong id="successHeading">You're subscribed!</strong>
+                        <span id="successDesc">Thanks for joining — expect great deals in your inbox.</span>
+                        <span class="newsletter-success-count" id="successCount"><i class="fas fa-users"></i> Join <strong>{{ subscriber_count }}</strong> other subscribers</span>
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="newsletter-glow"></div>
     </section>
 
     <!-- Footer -->
@@ -597,39 +615,57 @@
         startTimer();
     })();
 
-    // Sale countdown timer
+    // Sale countdown timer — server-driven flash_sale_end
     (function() {
         var h = document.getElementById('timer-hours');
         var m = document.getElementById('timer-mins');
         var s = document.getElementById('timer-secs');
-        if (!h || !m || !s) return;
-        var total = 23 * 3600 + 59 * 60 + 45;
+        var el = document.getElementById('hero-timer');
+        if (!h || !m || !s || !el) return;
+        var endDate = new Date(el.getAttribute('data-flash-sale-end')).getTime();
+        if (isNaN(endDate)) return;
         function tick() {
-            if (total <= 0) total = 24 * 3600;
-            var hh = Math.floor(total / 3600);
-            var mm = Math.floor((total % 3600) / 60);
-            var ss = total % 60;
-            h.textContent = String(hh).padStart(2, '0');
-            m.textContent = String(mm).padStart(2, '0');
-            s.textContent = String(ss).padStart(2, '0');
-            total--;
+            var diff = endDate - new Date().getTime();
+            if (diff <= 0) {
+                h.textContent = '00'; m.textContent = '00'; s.textContent = '00';
+                return;
+            }
+            var total = Math.floor(diff / 1000);
+            h.textContent = String(Math.floor(total / 3600)).padStart(2, '0');
+            m.textContent = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
+            s.textContent = String(total % 60).padStart(2, '0');
         }
         tick();
         setInterval(tick, 1000);
     })();
-
     // Newsletter AJAX
+    (function() {
+        var section = document.getElementById('newsletterSection');
+        var action = document.getElementById('newsletterAction');
+        var success = document.getElementById('newsletterSuccess');
+        if (!section) return;
+
+        if (localStorage.getItem('nl_subscribed') === '1') {
+            action.style.display = 'none';
+            success.style.display = 'flex';
+            section.classList.add('subscribed');
+        }
+    })();
+
     function handleNewsletter(e) {
         e.preventDefault();
         var form = document.getElementById('newsletterForm');
         var emailInput = document.getElementById('newsletterEmail');
         var btn = document.getElementById('newsletterBtn');
         var msg = document.getElementById('newsletterMsg');
+        var action = document.getElementById('newsletterAction');
+        var success = document.getElementById('newsletterSuccess');
+        var section = document.getElementById('newsletterSection');
         var email = emailInput.value.trim();
         if (!email) return false;
 
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subscribing...';
+        btn.innerHTML = 'Subscribing...';
         msg.textContent = '';
         msg.className = 'newsletter-msg';
 
@@ -643,17 +679,27 @@
         })
         .then(function(r) { return r.json(); })
         .then(function(data) {
-            msg.textContent = data.message;
-            msg.className = 'newsletter-msg ' + (data.success ? 'success' : 'error');
-            if (data.success) emailInput.value = '';
+            if (data.success) {
+                action.style.display = 'none';
+                success.style.display = 'flex';
+                section.classList.add('subscribed');
+                localStorage.setItem('nl_subscribed', '1');
+                if (data.count) {
+                    document.getElementById('subscriberCount').textContent = data.count;
+                    document.getElementById('successCount').innerHTML = '<i class=\"fas fa-users\"></i> Join <strong>' + data.count + '</strong> other subscribers';
+                }
+            } else {
+                msg.textContent = data.message;
+                msg.className = 'newsletter-msg error';
+                btn.disabled = false;
+                btn.innerHTML = '<span>Subscribe</span> <i class="fas fa-arrow-right"></i>';
+            }
         })
         .catch(function() {
             msg.textContent = 'Something went wrong. Please try again.';
             msg.className = 'newsletter-msg error';
-        })
-        .finally(function() {
             btn.disabled = false;
-            btn.innerHTML = 'Subscribe <i class="fas fa-arrow-right"></i>';
+            btn.innerHTML = '<span>Subscribe</span> <i class="fas fa-arrow-right"></i>';
         });
         return false;
     }

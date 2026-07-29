@@ -5,7 +5,7 @@
 
 {% block content %}
 <!-- Hero Banner -->
-<section class="page-hero" id="pageHero">
+<section class="page-hero{% if hero_context.icon == 'fa-filter' or hero_context.icon == 'fa-magnifying-glass' %} page-hero-search{% endif %}" id="pageHero">
     <div class="page-hero-bg">
         <div class="page-hero-mesh"></div>
         <div class="page-hero-orb page-hero-orb-1"></div>
@@ -13,9 +13,9 @@
     </div>
     <div class="page-hero-content">
         <div class="page-hero-text">
-            <div class="page-hero-badge"><i class="fas fa-store"></i> Marketplace</div>
-            <h1 class="page-hero-title">Explore Our<br><span class="page-hero-accent">Collection</span></h1>
-            <p class="page-hero-desc">Browse {{ products.paginator.count }} products from trusted sellers across Nepal</p>
+            <div class="page-hero-badge"><i class="fas {{ hero_context.icon|default:'fa-store' }}"></i> {{ hero_context.badge|default:'Marketplace' }}</div>
+            <h1 class="page-hero-title">{{ hero_context.title|default:'Explore Our<br><span class="page-hero-accent">Collection</span>' }}</h1>
+            <p class="page-hero-desc">{{ hero_context.subtitle|default:'Browse products from trusted sellers across Nepal' }}</p>
             <div class="page-hero-actions">
                 <a href="{% url 'search' %}?sort=popular" class="btn-hero-primary btn-hero-sm"><span>Top Picks</span><i class="fas fa-arrow-right"></i></a>
                 <a href="{% url 'search' %}?sort=newest" class="btn-hero-ghost btn-hero-sm"><i class="fas fa-sparkles"></i> New Arrivals</a>
@@ -23,7 +23,7 @@
         </div>
         <div class="page-hero-visual">
             <div class="page-hero-stat-ring">
-                <div class="page-hero-stat-item"><span class="page-hero-stat-num">{{ products.paginator.count }}</span><span class="page-hero-stat-label">Products</span></div>
+                <div class="page-hero-stat-item"><span class="page-hero-stat-num">{{ product_count }}</span><span class="page-hero-stat-label">Products</span></div>
                 <div class="page-hero-stat-item"><span class="page-hero-stat-num">{{ categories|length }}</span><span class="page-hero-stat-label">Categories</span></div>
             </div>
         </div>
@@ -88,15 +88,15 @@
             <li>
                 <a href="{% url 'products' %}?category={{ cat.slug }}" class="{% if selected_category == cat.slug %}active{% endif %}">
                     <span class="category-list-icon">
-                        {% if cat.icon == 'fa-spa' %}<i class="fas fa-spa"></i>
-                        {% elif cat.icon == 'fa-book' %}<i class="fas fa-book-open"></i>
-                        {% elif cat.icon == 'fa-shirt' %}<i class="fas fa-shirt"></i>
-                        {% elif cat.icon == 'fa-microchip' %}<i class="fas fa-microchip"></i>
-                        {% elif cat.icon == 'fa-house' %}<i class="fas fa-house-chimney"></i>
-                        {% elif cat.icon == 'fa-dumbbell' %}<i class="fas fa-dumbbell"></i>
-                        {% elif cat.icon == 'fa-box' %}<i class="fas fa-wine-glass"></i>
-                        {% elif cat.icon == 'fa-utensils' %}<i class="fas fa-utensils"></i>
-                        {% else %}<i class="fas fa-tag"></i>
+                        {% if cat.icon == 'fa-spa' %}<span class="cat-list-emoji">💄</span>
+                        {% elif cat.icon == 'fa-book' %}<span class="cat-list-emoji">📚</span>
+                        {% elif cat.icon == 'fa-shirt' %}<span class="cat-list-emoji">👕</span>
+                        {% elif cat.icon == 'fa-microchip' %}<span class="cat-list-emoji">💻</span>
+                        {% elif cat.icon == 'fa-house' %}<span class="cat-list-emoji">🏠</span>
+                        {% elif cat.icon == 'fa-dumbbell' %}<span class="cat-list-emoji">🏋️</span>
+                        {% elif cat.icon == 'fa-box' %}<span class="cat-list-emoji">🍷</span>
+                        {% elif cat.icon == 'fa-utensils' %}<span class="cat-list-emoji">🍕</span>
+                        {% else %}<span class="cat-list-emoji">🏷️</span>
                         {% endif %}
                     </span>
                     {{ cat.name }}
