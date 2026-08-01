@@ -4,29 +4,158 @@
 {% block title %}Products - Islington Marketplace{% endblock %}
 
 {% block content %}
-<!-- Hero Banner -->
-<section class="page-hero{% if hero_context.icon == 'fa-filter' or hero_context.icon == 'fa-magnifying-glass' %} page-hero-search{% endif %}" id="pageHero">
-    <div class="page-hero-bg">
-        <div class="page-hero-mesh"></div>
-        <div class="page-hero-orb page-hero-orb-1"></div>
-        <div class="page-hero-orb page-hero-orb-2"></div>
+<!-- Hero Carousel -->
+<section class="page-hero-carousel" id="pageHeroCarousel" aria-label="Products showcase">
+    <div class="page-hero-slides">
+        <!-- Slide 1: Collection -->
+        <div class="page-hero-slide active" data-slide="collection">
+            <div class="page-hero-bg">
+                <div class="page-hero-mesh"></div>
+                <div class="page-hero-orb page-hero-orb-1"></div>
+                <div class="page-hero-orb page-hero-orb-2"></div>
+            </div>
+            <div class="page-hero-content">
+                <div class="page-hero-text">
+                    <div class="page-hero-badge"><i class="fas {{ hero_context.icon|default:'fa-store' }}"></i> {{ hero_context.badge|default:'Collection' }}</div>
+                    <h1 class="page-hero-title">{{ hero_context.title|default:'Explore Our<br><span class="page-hero-accent">Collection</span>' }}</h1>
+                    <p class="page-hero-desc">{{ hero_context.subtitle|default:'Browse products from trusted sellers across Nepal' }}</p>
+                    <div class="page-hero-actions">
+                        <a href="{% url 'search' %}?sort=popular" class="btn-hero-primary btn-hero-sm"><span>Top Picks</span><i class="fas fa-arrow-right"></i></a>
+                        <a href="{% url 'search' %}?sort=newest" class="btn-hero-ghost btn-hero-sm"><i class="fas fa-sparkles"></i> New Arrivals</a>
+                    </div>
+                </div>
+                <div class="page-hero-visual">
+                    <div class="page-hero-stat-ring">
+                        <div class="page-hero-stat-item"><span class="page-hero-stat-num">{{ product_count }}</span><span class="page-hero-stat-label">Products</span></div>
+                        <div class="page-hero-stat-item"><span class="page-hero-stat-num">{{ categories|length }}</span><span class="page-hero-stat-label">Categories</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Trending Now -->
+        <div class="page-hero-slide" data-slide="trending">
+            <div class="page-hero-bg page-hero-bg-trend">
+                <div class="page-hero-mesh"></div>
+                <div class="page-hero-orb page-hero-orb-1"></div>
+                <div class="page-hero-orb page-hero-orb-2"></div>
+            </div>
+            <div class="page-hero-content">
+                <div class="page-hero-text">
+                    <div class="page-hero-badge page-hero-badge-rose"><i class="fas fa-fire"></i> Trending Now</div>
+                    <h1 class="page-hero-title">Most Popular<br><span class="page-hero-accent page-hero-accent-rose">Best Sellers</span></h1>
+                    <p class="page-hero-desc">Discover what everyone is talking about — top-rated products loved by customers across Nepal.</p>
+                    <div class="page-hero-actions">
+                        <a href="{% url 'search' %}?sort=popular" class="btn-hero-primary btn-hero-red btn-hero-sm"><span>View Best Sellers</span><i class="fas fa-arrow-right"></i></a>
+                        <a href="{% url 'search' %}?sort=rating" class="btn-hero-ghost btn-hero-sm"><i class="fas fa-star"></i> Top Rated</a>
+                    </div>
+                </div>
+                {% if hero_products %}
+                <div class="page-hero-visual">
+                    <div class="hero-product-stack ph-stack">
+                        {% for p in hero_products|slice:":3" %}
+                        <a href="{% url 'product_detail' p.id %}" class="hero-stack-card phsc-{{ forloop.counter }}" title="{{ p.product_name }}">
+                            {% if p.product_image %}
+                            <img src="{{ p.product_image.url }}" alt="{{ p.product_name }}">
+                            {% endif %}
+                            <div class="hero-stack-info">
+                                <span class="hero-stack-price">Rs. {{ p.discount_price|default:p.price|floatformat:0 }}</span>
+                                <span class="hero-stack-name">{{ p.product_name|truncatechars:18 }}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Slide 3: Best Deals -->
+        <div class="page-hero-slide" data-slide="deals">
+            <div class="page-hero-bg page-hero-bg-deal">
+                <div class="page-hero-mesh"></div>
+                <div class="page-hero-orb page-hero-orb-1"></div>
+                <div class="page-hero-orb page-hero-orb-2"></div>
+            </div>
+            <div class="page-hero-content">
+                <div class="page-hero-text">
+                    <div class="page-hero-badge page-hero-badge-gold"><i class="fas fa-tags"></i> Best Deals</div>
+                    <h1 class="page-hero-title">Great Savings<br><span class="page-hero-accent">Await You</span></h1>
+                    <p class="page-hero-desc">Shop discounted products with amazing offers. Limited time deals you won't want to miss.</p>
+                    <div class="page-hero-actions">
+                        <a href="{% url 'products' %}" class="btn-hero-primary btn-hero-sm"><span>Shop Deals</span><i class="fas fa-arrow-right"></i></a>
+                        <a href="{% url 'search' %}?sort=price_low" class="btn-hero-ghost btn-hero-sm"><i class="fas fa-arrow-down"></i> Lowest Prices</a>
+                    </div>
+                </div>
+                {% if hero_products %}
+                <div class="page-hero-visual">
+                    <div class="hero-product-stack ph-stack">
+                        {% for p in hero_products|slice:"3:6" %}
+                        <a href="{% url 'product_detail' p.id %}" class="hero-stack-card phsc-{{ forloop.counter }}" title="{{ p.product_name }}">
+                            {% if p.product_image %}
+                            <img src="{{ p.product_image.url }}" alt="{{ p.product_name }}">
+                            {% endif %}
+                            <div class="hero-stack-info">
+                                {% if p.discount_price %}
+                                <span class="hero-stack-price hero-stack-price-sale">Rs. {{ p.discount_price|floatformat:0 }}</span>
+                                {% else %}
+                                <span class="hero-stack-price">Rs. {{ p.price|floatformat:0 }}</span>
+                                {% endif %}
+                                <span class="hero-stack-name">{{ p.product_name|truncatechars:18 }}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Slide 4: Categories -->
+        <div class="page-hero-slide" data-slide="categories">
+            <div class="page-hero-bg page-hero-bg-cat">
+                <div class="page-hero-mesh"></div>
+                <div class="page-hero-orb page-hero-orb-1"></div>
+                <div class="page-hero-orb page-hero-orb-2"></div>
+            </div>
+            <div class="page-hero-content">
+                <div class="page-hero-text">
+                    <div class="page-hero-badge page-hero-badge-blue"><i class="fas fa-th-large"></i> Shop by Category</div>
+                    <h1 class="page-hero-title">Find What You<br><span class="page-hero-accent page-hero-accent-blue">Need</span></h1>
+                    <p class="page-hero-desc">Browse through {{ categories|length }} categories — from electronics to fashion, we have it all.</p>
+                    <div class="page-hero-actions">
+                        <a href="{% url 'products' %}" class="btn-hero-primary btn-hero-blue btn-hero-sm"><span>All Categories</span><i class="fas fa-arrow-right"></i></a>
+                        <a href="{% url 'search' %}?sort=newest" class="btn-hero-ghost btn-hero-sm"><i class="fas fa-sparkles"></i> New Arrivals</a>
+                    </div>
+                </div>
+                <div class="page-hero-visual">
+                    <div class="page-hero-stat-ring">
+                        <div class="page-hero-stat-item"><span class="page-hero-stat-num">{{ product_count }}</span><span class="page-hero-stat-label">Products</span></div>
+                        <div class="page-hero-stat-item"><span class="page-hero-stat-num">{{ categories|length }}</span><span class="page-hero-stat-label">Categories</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="page-hero-content">
-        <div class="page-hero-text">
-            <div class="page-hero-badge"><i class="fas {{ hero_context.icon|default:'fa-store' }}"></i> {{ hero_context.badge|default:'Marketplace' }}</div>
-            <h1 class="page-hero-title">{{ hero_context.title|default:'Explore Our<br><span class="page-hero-accent">Collection</span>' }}</h1>
-            <p class="page-hero-desc">{{ hero_context.subtitle|default:'Browse products from trusted sellers across Nepal' }}</p>
-            <div class="page-hero-actions">
-                <a href="{% url 'search' %}?sort=popular" class="btn-hero-primary btn-hero-sm"><span>Top Picks</span><i class="fas fa-arrow-right"></i></a>
-                <a href="{% url 'search' %}?sort=newest" class="btn-hero-ghost btn-hero-sm"><i class="fas fa-sparkles"></i> New Arrivals</a>
-            </div>
+
+    <button class="page-hero-nav page-hero-nav-prev" aria-label="Previous slide"><i class="fas fa-chevron-left"></i></button>
+    <button class="page-hero-nav page-hero-nav-next" aria-label="Next slide"><i class="fas fa-chevron-right"></i></button>
+
+    <div class="page-hero-indicators">
+        <div class="page-hero-dots">
+            <button class="page-hero-dot active" data-dot="0" aria-label="Slide 1"></button>
+            <button class="page-hero-dot" data-dot="1" aria-label="Slide 2"></button>
+            <button class="page-hero-dot" data-dot="2" aria-label="Slide 3"></button>
+            <button class="page-hero-dot" data-dot="3" aria-label="Slide 4"></button>
         </div>
-        <div class="page-hero-visual">
-            <div class="page-hero-stat-ring">
-                <div class="page-hero-stat-item"><span class="page-hero-stat-num">{{ product_count }}</span><span class="page-hero-stat-label">Products</span></div>
-                <div class="page-hero-stat-item"><span class="page-hero-stat-num">{{ categories|length }}</span><span class="page-hero-stat-label">Categories</span></div>
-            </div>
-        </div>
+        <div class="page-hero-counter"><span class="page-hero-counter-current">01</span> / <span class="page-hero-counter-total">04</span></div>
+    </div>
+
+    <div class="page-hero-progress">
+        <div class="page-hero-progress-bar active"><div class="page-hero-progress-bar-fill"></div></div>
+        <div class="page-hero-progress-bar"><div class="page-hero-progress-bar-fill"></div></div>
+        <div class="page-hero-progress-bar"><div class="page-hero-progress-bar-fill"></div></div>
+        <div class="page-hero-progress-bar"><div class="page-hero-progress-bar-fill"></div></div>
     </div>
 </section>
 
@@ -307,6 +436,135 @@ function showToast(message, type) {
     setTimeout(() => toast.classList.add('show'), 10);
     setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
 }
+
+// Page Hero Carousel — Premium
+(function() {
+    var carousel = document.querySelector('.page-hero-carousel');
+    if (!carousel) return;
+    var slides = carousel.querySelectorAll('.page-hero-slide');
+    var prevBtn = carousel.querySelector('.page-hero-nav-prev');
+    var nextBtn = carousel.querySelector('.page-hero-nav-next');
+    var counterCurrent = carousel.querySelector('.page-hero-counter-current');
+    var counterTotal = carousel.querySelector('.page-hero-counter-total');
+    var dots = carousel.querySelectorAll('.page-hero-dot');
+    var progressBars = carousel.querySelectorAll('.page-hero-progress-bar');
+    var total = slides.length;
+    if (total < 2) return;
+    var current = 0;
+    var interval = 5000;
+    var timer;
+    var paused = false;
+    var touchStartX = 0;
+    var touchEndX = 0;
+
+    function updateCounter() {
+        if (counterCurrent) counterCurrent.textContent = String(current + 1).padStart(2, '0');
+        if (counterTotal) counterTotal.textContent = String(total).padStart(2, '0');
+    }
+
+    function updateDots() {
+        dots.forEach(function(d, i) {
+            d.classList.toggle('active', i === current);
+        });
+    }
+
+    function resetProgressBars() {
+        progressBars.forEach(function(bar, i) {
+            var fill = bar.querySelector('.page-hero-progress-bar-fill');
+            if (!fill) return;
+            fill.style.animation = 'none';
+            fill.offsetHeight;
+            bar.classList.remove('active', 'paused');
+            if (i === current) {
+                bar.style.display = 'block';
+                bar.classList.add('active');
+                fill.style.animation = 'progressFill ' + (interval / 1000) + 's linear forwards';
+            } else if (i < current) {
+                fill.style.width = '100%';
+                bar.style.display = 'block';
+            } else {
+                fill.style.width = '0';
+                bar.style.display = 'block';
+            }
+        });
+    }
+
+    function goToSlide(index, userInitiated) {
+        if (index === current) return;
+        slides[current].classList.remove('active');
+        current = index;
+        slides[current].classList.add('active');
+        updateCounter();
+        updateDots();
+        resetProgressBars();
+        if (userInitiated) {
+            paused = true;
+            stopTimer();
+        }
+    }
+
+    function startTimer() { stopTimer(); if (!paused) { timer = setInterval(function() { goToSlide((current + 1) % total, false); }, interval); } }
+    function stopTimer() { clearInterval(timer); }
+
+    // Prev / Next buttons
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            goToSlide((current - 1 + total) % total, true);
+        });
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            goToSlide((current + 1) % total, true);
+        });
+    }
+
+    // Dots
+    dots.forEach(function(dot) {
+        dot.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var idx = parseInt(this.getAttribute('data-dot'));
+            if (!isNaN(idx) && idx !== current) goToSlide(idx, true);
+        });
+    });
+
+    // Click anywhere on carousel to advance
+    carousel.addEventListener('click', function(e) {
+        if (e.target.closest('.page-hero-nav') || e.target.closest('.page-hero-actions') || e.target.closest('a') || e.target.closest('.hero-stack-card') || e.target.closest('.page-hero-dot')) return;
+        goToSlide((current + 1) % total, true);
+    });
+
+    // Pause on hover / resume on leave
+    carousel.addEventListener('mouseenter', function() { if (!paused) stopTimer(); });
+    carousel.addEventListener('mouseleave', function() { if (!paused) { stopTimer(); startTimer(); } });
+
+    // Touch swipe
+    carousel.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    carousel.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        var diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) goToSlide((current + 1) % total, true);
+            else goToSlide((current - 1 + total) % total, true);
+        }
+    }, { passive: true });
+
+    // Keyboard
+    carousel.setAttribute('tabindex', '0');
+    carousel.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') { goToSlide((current - 1 + total) % total, true); e.preventDefault(); }
+        if (e.key === 'ArrowRight') { goToSlide((current + 1) % total, true); e.preventDefault(); }
+    });
+
+    // Init
+    updateCounter();
+    updateDots();
+    resetProgressBars();
+    startTimer();
+})();
 
 // View toggle (grid/list)
 document.querySelectorAll('.page-view-btn').forEach(function(btn) {

@@ -351,6 +351,10 @@ def search_view(request):
 
     categories = Category.objects.filter(is_active=True)
 
+    hero_pool = list(Product.objects.filter(status=True, product_image__isnull=False).order_by('-sold_count')[:30])
+    random.shuffle(hero_pool)
+    hero_products = hero_pool[:12]
+
     total_count = paginator.count
 
     if active_filters:
@@ -385,6 +389,7 @@ def search_view(request):
         'max_price': max_price,
         'rating': rating,
         'hero_context': hero_context,
+        'hero_products': hero_products,
         'product_count': total_count,
     }
     return render(request, 'products/search_results.html', context)
@@ -465,16 +470,43 @@ def subscribe_view(request):
         path = urlparse(referer).path if referer else ''
         return redirect(path if path.startswith('/') else 'home')
 
-    if Subscriber.objects.filter(email=email).exists():
-        subscriber = Subscriber.objects.get(email=email)
+    # Authenticated users subscribe with their account email only, which
+    # prevents subscribing many different emails from the same login.
+    if request.user.is_authenticated and request.user.email:
+        email = request.user.email
+
+    # Anonymous users may subscribe exactly once per session.
+    if not request.user.is_authenticated:
+        session_email = request.session.get('newsletter_email', '')
+        if session_email and session_email.lower() != email.lower():
+            if Subscriber.objects.filter(email__iexact=session_email, is_active=True).exists():
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'message': 'You are already subscribed!'})
+                messages.error(request, 'You are already subscribed!')
+                from urllib.parse import urlparse
+                referer = request.META.get('HTTP_REFERER', '')
+                path = urlparse(referer).path if referer else ''
+                return redirect(path if path.startswith('/') else 'home')
+
+    subscriber = Subscriber.objects.filter(email__iexact=email).first()
+    if subscriber is not None:
         if subscriber.is_active:
-            return JsonResponse({'success': False, 'message': 'You are already subscribed!'})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'message': 'You are already subscribed!'})
+            messages.error(request, 'You are already subscribed!')
+            from urllib.parse import urlparse
+            referer = request.META.get('HTTP_REFERER', '')
+            path = urlparse(referer).path if referer else ''
+            return redirect(path if path.startswith('/') else 'home')
+        subscriber.email = email
         subscriber.is_active = True
         subscriber.save()
         msg = 'Welcome back! Your subscription has been reactivated.'
     else:
         Subscriber.objects.create(email=email)
         msg = 'Thank you for subscribing!'
+
+    request.session['newsletter_email'] = email
 
     count = Subscriber.objects.filter(is_active=True).count()
 

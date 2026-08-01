@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4.4">
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -25,15 +25,6 @@
                 <span><i class="fas fa-truck"></i> Free shipping on orders over Rs. 5,000</span>
                 <span class="top-bar-divider">|</span>
                 <span><i class="fas fa-rotate-left"></i> 30-day return policy</span>
-            </div>
-            <div class="top-bar-right">
-                {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}"><i class="fas fa-user"></i> My Account</a>
-                {% else %}
-                    <a href="{% url 'login' %}"><i class="fas fa-arrow-right-to-bracket"></i> Login</a>
-                    <span class="top-bar-divider">|</span>
-                    <a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Register</a>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -106,7 +97,7 @@
                         <div class="user-menu" id="userDropdown">
                             <button class="user-dropdown-btn" aria-label="Account menu" aria-expanded="false">
                                 <div class="user-avatar">{{ user.first_name.0|default:user.username.0|upper }}</div>
-                                <span class="user-avatar-name">{{ user.first_name|default:user.username|truncatechars:12 }}</span>
+                                <span class="user-avatar-name">My Account</span>
                                 <i class="fas fa-chevron-down" style="font-size: 10px; color: var(--ink-muted);"></i>
                             </button>
                             <div class="user-dropdown" role="menu">
@@ -136,8 +127,11 @@
                             </div>
                         </div>
                     {% else %}
-                        <a href="{% url 'login' %}" class="nav-action-btn" aria-label="Login">
-                            <i class="fas fa-circle-user"></i>
+                        <a href="{% url 'login' %}" class="nav-auth-link" aria-label="Login">
+                            <i class="fas fa-arrow-right-to-bracket"></i> Login
+                        </a>
+                        <a href="{% url 'register' %}" class="btn btn-primary nav-register-btn">
+                            <i class="fas fa-user-plus"></i> Register
                         </a>
                     {% endif %}
 
@@ -171,6 +165,9 @@
             <a href="{% url 'register' %}" class="mobile-nav-link"><i class="fas fa-user-plus"></i> Create Account</a>
         {% endif %}
         <div class="mobile-nav-divider"></div>
+        <button class="mobile-nav-link mobile-theme-toggle" id="themeToggleMobile" type="button" aria-label="Toggle dark mode">
+            <i class="fas fa-moon"></i> <span id="themeToggleMobileLabel">Dark Mode</span>
+        </button>
         <a href="{% url 'contact' %}" class="mobile-nav-link"><i class="fas fa-envelope"></i> Contact</a>
     </div>
 
@@ -192,39 +189,56 @@
     </main>
 
     <!-- Newsletter CTA - full width dark strip above footer -->
-    <section class="newsletter-section" id="newsletterSection">
+    <section class="newsletter-section{% if newsletter_subscribed %} subscribed{% endif %}" id="newsletterSection">
+        <div class="newsletter-bg" aria-hidden="true">
+            <div class="newsletter-orb newsletter-orb-1"></div>
+            <div class="newsletter-orb newsletter-orb-2"></div>
+            <div class="newsletter-grid"></div>
+        </div>
         <div class="main-content">
             <div class="newsletter-inner">
                 <div class="newsletter-text">
-                    <span class="newsletter-badge">Newsletter</span>
-                    <h2 id="newsletterTitle">Stay in the Loop</h2>
-                    <p id="newsletterDesc">Get exclusive deals, new arrivals, and insider tips delivered to your inbox.</p>
+                    <span class="newsletter-badge"><i class="fas fa-envelope-open-text"></i> Newsletter</span>
+                    <h2 id="newsletterTitle">Get the best deals,<br><span class="nl-accent">straight to your inbox</span></h2>
+                    <p id="newsletterDesc">Join <strong id="subscriberCount" class="nl-count">{{ subscriber_count }}</strong>+ subscribers getting member-only offers, early access to new arrivals, and insider tips. No spam — ever.</p>
                     <div class="newsletter-social-proof" id="newsletterSocial">
-                        <span class="newsletter-count"><i class="fas fa-users"></i> <span id="subscriberCount">{{ subscriber_count }}</span>+ subscribers</span>
+                        <div class="nl-avatars">
+                            <span class="nl-avatar">K</span>
+                            <span class="nl-avatar">S</span>
+                            <span class="nl-avatar">A</span>
+                            <span class="nl-avatar nl-avatar-more">+{{ subscriber_count }}</span>
+                        </div>
+                        <span class="newsletter-count">Trusted by shoppers across Nepal</span>
                     </div>
                 </div>
-                <div class="newsletter-action" id="newsletterAction">
-                    <form class="newsletter-form" id="newsletterForm" action="{% url 'subscribe' %}" onsubmit="return handleNewsletter(event)">
-                        {% csrf_token %}
-                        <div class="newsletter-input-group">
-                            <i class="fas fa-envelope newsletter-input-icon"></i>
-                            <input type="email" name="email" placeholder="Your email address" required aria-label="Email address" id="newsletterEmail" autocomplete="email">
+                <div class="newsletter-card">
+                    <div class="newsletter-action" id="newsletterAction" {% if newsletter_subscribed %}style="display:none"{% endif %}>
+                        <div class="newsletter-card-title"><i class="fas fa-paper-plane"></i> Subscribe for exclusive offers</div>
+                        <form class="newsletter-form" id="newsletterForm" action="{% url 'subscribe' %}" onsubmit="return handleNewsletter(event)">
+                            {% csrf_token %}
+                            <div class="newsletter-input-group">
+                                <i class="fas fa-envelope newsletter-input-icon"></i>
+                                <input type="email" name="email" placeholder="Enter your email address" required aria-label="Email address" id="newsletterEmail" autocomplete="email" value="{{ newsletter_email }}">
+                                <button type="submit" class="btn" id="newsletterBtn"><span>Subscribe</span> <i class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </form>
+                        <div class="newsletter-msg" id="newsletterMsg"></div>
+                        <div class="newsletter-perks">
+                            <span><i class="fas fa-shield-halved"></i> No spam, ever</span>
+                            <span><i class="fas fa-ban"></i> Unsubscribe anytime</span>
                         </div>
-                        <button type="submit" class="btn btn-accent" id="newsletterBtn"><span>Subscribe</span> <i class="fas fa-arrow-right"></i></button>
-                    </form>
-                    <div class="newsletter-msg" id="newsletterMsg"></div>
-                </div>
-                <div class="newsletter-success" id="newsletterSuccess" style="display:none">
-                    <div class="newsletter-success-icon"><i class="fas fa-check"></i></div>
-                    <div class="newsletter-success-text">
-                        <strong id="successHeading">You're subscribed!</strong>
-                        <span id="successDesc">Thanks for joining — expect great deals in your inbox.</span>
-                        <span class="newsletter-success-count" id="successCount"><i class="fas fa-users"></i> Join <strong>{{ subscriber_count }}</strong> other subscribers</span>
+                    </div>
+                    <div class="newsletter-success" id="newsletterSuccess" {% if not newsletter_subscribed %}style="display:none"{% endif %}>
+                        <div class="newsletter-success-icon"><i class="fas fa-check"></i></div>
+                        <div class="newsletter-success-text">
+                            <strong id="successHeading">You're all set!</strong>
+                            <span id="successDesc">You'll be the first to know about exclusive offers and new arrivals.</span>
+                            <span class="newsletter-success-count"><i class="fas fa-users"></i> Join <strong id="successCount">{{ subscriber_count }}</strong> other subscribers</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="newsletter-glow"></div>
     </section>
 
     <!-- Footer -->
@@ -451,22 +465,39 @@
 
         // Dark Mode Toggle
         var themeToggle = document.getElementById('themeToggle');
+        var themeToggleMobile = document.getElementById('themeToggleMobile');
+        var themeToggleMobileLabel = document.getElementById('themeToggleMobileLabel');
         var html = document.documentElement;
         var savedTheme = localStorage.getItem('theme') || 'light';
         html.setAttribute('data-theme', savedTheme);
         updateThemeIcon(savedTheme);
 
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateThemeIcon(theme);
+        }
+
         themeToggle.addEventListener('click', function() {
-            var current = html.getAttribute('data-theme');
-            var next = current === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
-            updateThemeIcon(next);
+            setTheme(html.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
         });
+
+        if (themeToggleMobile) {
+            themeToggleMobile.addEventListener('click', function() {
+                setTheme(html.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+            });
+        }
 
         function updateThemeIcon(theme) {
             var icon = themeToggle.querySelector('i');
             icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            if (themeToggleMobile) {
+                var mIcon = themeToggleMobile.querySelector('i');
+                mIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+                if (themeToggleMobileLabel) {
+                    themeToggleMobileLabel.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+                }
+            }
         }
 
         // Back to Top
@@ -641,13 +672,16 @@
     // Newsletter AJAX
     (function() {
         var section = document.getElementById('newsletterSection');
-        var action = document.getElementById('newsletterAction');
-        var success = document.getElementById('newsletterSuccess');
         if (!section) return;
 
-        if (localStorage.getItem('nl_subscribed') === '1') {
-            action.style.display = 'none';
-            success.style.display = 'flex';
+        // The subscribed state is rendered server-side and bound to the
+        // current user/session, so no localStorage flag is needed here.
+        var action = document.getElementById('newsletterAction');
+        var success = document.getElementById('newsletterSuccess');
+        if (action && getComputedStyle(action).display !== 'none') {
+            section.classList.remove('subscribed');
+        }
+        if (success && getComputedStyle(success).display !== 'none') {
             section.classList.add('subscribed');
         }
     })();
@@ -665,7 +699,7 @@
         if (!email) return false;
 
         btn.disabled = true;
-        btn.innerHTML = 'Subscribing...';
+        btn.innerHTML = '<span>Subscribing...</span>';
         msg.textContent = '';
         msg.className = 'newsletter-msg';
 
@@ -683,10 +717,11 @@
                 action.style.display = 'none';
                 success.style.display = 'flex';
                 section.classList.add('subscribed');
-                localStorage.setItem('nl_subscribed', '1');
                 if (data.count) {
-                    document.getElementById('subscriberCount').textContent = data.count;
-                    document.getElementById('successCount').innerHTML = '<i class=\"fas fa-users\"></i> Join <strong>' + data.count + '</strong> other subscribers';
+                    var countEl = document.getElementById('subscriberCount');
+                    if (countEl) countEl.textContent = data.count;
+                    var successEl = document.getElementById('successCount');
+                    if (successEl) successEl.textContent = data.count;
                 }
             } else {
                 msg.textContent = data.message;

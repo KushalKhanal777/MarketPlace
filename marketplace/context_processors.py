@@ -48,7 +48,29 @@ def notifications_context(request):
 
 
 def newsletter_context(request):
-    """Make subscriber count available globally for the newsletter section."""
+    """Make subscriber data available globally for the newsletter section.
+
+    The subscribed state is bound to the logged-in user's email, falling back
+    to the email subscribed within the current anonymous session. This keeps
+    the state correct per user instead of relying on a global browser flag.
+    """
+    subscribed = False
+    email = ''
+
+    if request.user.is_authenticated:
+        email = request.user.email or ''
+        subscribed = bool(email) and Subscriber.objects.filter(
+            email__iexact=email, is_active=True
+        ).exists()
+    else:
+        email = request.session.get('newsletter_email', '') or ''
+        if email:
+            subscribed = Subscriber.objects.filter(
+                email__iexact=email, is_active=True
+            ).exists()
+
     return {
         'subscriber_count': Subscriber.objects.filter(is_active=True).count(),
+        'newsletter_subscribed': subscribed,
+        'newsletter_email': email,
     }

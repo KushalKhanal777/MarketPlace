@@ -1,3 +1,4 @@
+import random
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -84,11 +85,16 @@ def products(request):
 
     categories = Category.objects.filter(is_active=True)
 
+    hero_pool = list(Product.objects.filter(status=True, product_image__isnull=False).order_by('-sold_count')[:30])
+    random.shuffle(hero_pool)
+    hero_products = hero_pool[:12]
+
     context = {
         'products': product_list,
         'categories': categories,
         'selected_category': category_slug,
         'hero_context': hero_context,
+        'hero_products': hero_products,
         'product_count': product_list.count(),
     }
     return render(request, 'products/products.html', context)
